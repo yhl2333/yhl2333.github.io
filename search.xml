@@ -4,26 +4,50 @@
   
     
     <entry>
-      <title>第二篇文章</title>
-      <link href="/2022/11/20/2022-11-20/"/>
-      <url>/2022/11/20/2022-11-20/</url>
+      <title>测试文章</title>
+      <link href="/2022-11-20/"/>
+      <url>/2022-11-20/</url>
       
-        <content type="html"><![CDATA[<p>建博客来第二篇文章</p>]]></content>
+        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png"><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 个人 </tag>
+            
+        </tags>
       
     </entry>
     
     
     
     <entry>
-      <title>第一篇文章</title>
-      <link href="/2022/11/20/2022-11-21/"/>
-      <url>/2022/11/20/2022-11-21/</url>
+      <title>音乐歌单</title>
+      <link href="/2022-11-21/"/>
+      <url>/2022-11-21/</url>
       
-        <content type="html"><![CDATA[<p>建博客来第一篇文章</p>]]></content>
+        <content type="html"><![CDATA[<p>强烈吐槽网易云音乐的复制按钮不好使</p><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=600 src="//music.163.com/outchain/player?type=0&id=2857114412&auto=0&height=430">旺仔小乔专辑</iframe>]]></content>
       
       
+      <categories>
+          
+          <category> music </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 个人 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -31,8 +55,8 @@
     
     <entry>
       <title>第三篇文章</title>
-      <link href="/2022/11/20/2022-11-22/"/>
-      <url>/2022/11/20/2022-11-22/</url>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
       
         <content type="html"><![CDATA[<p>建博客来第三篇文章</p>]]></content>
       
@@ -43,9 +67,22 @@
     
     
     <entry>
+      <title>第四篇文章</title>
+      <link href="/2022-11-23/"/>
+      <url>/2022-11-23/</url>
+      
+        <content type="html"><![CDATA[<p>建博客来第四篇文章</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>第五篇文章</title>
-      <link href="/2022/11/20/2022-11-24/"/>
-      <url>/2022/11/20/2022-11-24/</url>
+      <link href="/2022-11-24/"/>
+      <url>/2022-11-24/</url>
       
         <content type="html"><![CDATA[<p>建博客来第五篇文章</p>]]></content>
       
@@ -57,8 +94,8 @@
     
     <entry>
       <title>第六篇文章</title>
-      <link href="/2022/11/20/2022-11-25/"/>
-      <url>/2022/11/20/2022-11-25/</url>
+      <link href="/2022-11-25/"/>
+      <url>/2022-11-25/</url>
       
         <content type="html"><![CDATA[<p>建博客来第六篇文章</p>]]></content>
       
@@ -69,22 +106,9 @@
     
     
     <entry>
-      <title>第四篇文章</title>
-      <link href="/2022/11/20/2022-11-23/"/>
-      <url>/2022/11/20/2022-11-23/</url>
-      
-        <content type="html"><![CDATA[<p>建博客来第四篇文章</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>第七篇文章</title>
-      <link href="/2022/11/20/2022-11-26/"/>
-      <url>/2022/11/20/2022-11-26/</url>
+      <link href="/2022-11-26/"/>
+      <url>/2022-11-26/</url>
       
         <content type="html"><![CDATA[<p>建博客来第七篇文章</p>]]></content>
       
