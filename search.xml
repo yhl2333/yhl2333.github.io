@@ -29,16 +29,16 @@
     
     
     <entry>
-      <title>音乐歌单</title>
+      <title>关于为什么要创立博客</title>
       <link href="/2022-11-21/"/>
       <url>/2022-11-21/</url>
       
-        <content type="html"><![CDATA[<p>强烈吐槽网易云音乐的复制按钮不好使</p><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=600 src="//music.163.com/outchain/player?type=0&id=2857114412&auto=0&height=430">旺仔小乔专辑</iframe>]]></content>
+        <content type="html"><![CDATA[<p>开发者日志：<br>    今天是2022年11月21日，也是本人在博客网站几乎完成了所有的基础构建，开服的第一天。总体来说，我搭建博客有以下几个方面的考虑，首先<br>是充分的利用闲暇时间提升一下个人能力与素养，相当于写写日记，记录一下平时的所看所学，及时整理我在研究生生涯的学习思路与内容。在这个硕士博士遍地而无offer的年代，广泛的涉猎，融会贯通变得越来越重要，靠能力而非学历的时代已然到来。<br>    我就是个普通人，因此我想将自己的学习历程与踩过的坑分享给大家，帮助同样是想要学习一些热门知识并且想要交流沟通的人。相信已经学习四<br>年的你一定知道是否能够得到帮助的重要性，在此博客中，我会先将学习的内容分成以下几个我目前在学的大类，在这些类中我会分享我所看过的视频，通俗易懂的CSDN，知乎，以及我个人的梳理与理解。目前几个大类应该是：C++编程（QT），机器学习强化学习，计网与操作系统，硬软件茶谈（比如软硬件，git,服务器的使用手册等常识性知识）。<br>    搭建整个博客耗费了两天时间，保研以后空出的时间多了起来，我也在广泛学习一些网络技术以及编程技术，博客就是主要开发的项目之一，我也<br>推荐大家记录一些生活中的故事，在现如今如此无意义快节奏的生活中给自己留一点空间，反思提升自己显得格外珍贵。    </p>]]></content>
       
       
       <categories>
           
-          <category> music </category>
+          <category> 杂谈 </category>
           
       </categories>
       
@@ -54,37 +54,11 @@
     
     
     <entry>
-      <title>第三篇文章</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<p>建博客来第三篇文章</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>第四篇文章</title>
       <link href="/2022-11-23/"/>
       <url>/2022-11-23/</url>
       
         <content type="html"><![CDATA[<p>建博客来第四篇文章</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>第五篇文章</title>
-      <link href="/2022-11-24/"/>
-      <url>/2022-11-24/</url>
-      
-        <content type="html"><![CDATA[<p>建博客来第五篇文章</p>]]></content>
       
       
       
@@ -106,11 +80,37 @@
     
     
     <entry>
+      <title>博客使用手册</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="https://yhl2333.github.io/">https://yhl2333.github.io</a> 2333.</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>第七篇文章</title>
       <link href="/2022-11-26/"/>
       <url>/2022-11-26/</url>
       
         <content type="html"><![CDATA[<p>建博客来第七篇文章</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>第五篇文章</title>
+      <link href="/2022-11-24/"/>
+      <url>/2022-11-24/</url>
+      
+        <content type="html"><![CDATA[<p>建博客来第五篇文章</p>]]></content>
       
       
       
