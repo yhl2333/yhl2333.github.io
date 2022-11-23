@@ -4,6 +4,19 @@
   
     
     <entry>
+      <title>博客使用手册</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="https://yhl2333.github.io/">https://yhl2333.github.io</a> 2333.</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>测试文章</title>
       <link href="/2022-11-20/"/>
       <url>/2022-11-20/</url>
@@ -54,44 +67,6 @@
     
     
     <entry>
-      <title>博客使用手册</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="https://yhl2333.github.io/">https://yhl2333.github.io</a> 2333.</p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>第五篇文章</title>
-      <link href="/2022-11-24/"/>
-      <url>/2022-11-24/</url>
-      
-        <content type="html"><![CDATA[<p>建博客来第五篇文章</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 强化学习智能决策 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 强化学习 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>关于网络的认知</title>
       <link href="/2022-11-23/"/>
       <url>/2022-11-23/</url>
@@ -117,13 +92,25 @@
     
     
     <entry>
-      <title>第七篇文章</title>
-      <link href="/2022-11-26/"/>
-      <url>/2022-11-26/</url>
+      <title>第五篇文章</title>
+      <link href="/2022-11-24/"/>
+      <url>/2022-11-24/</url>
       
-        <content type="html"><![CDATA[<p>建博客来第七篇文章</p>]]></content>
+        <content type="html"><![CDATA[<p>建博客来第五篇文章</p>]]></content>
       
       
+      <categories>
+          
+          <category> 强化学习智能决策 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 强化学习 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -174,6 +161,19 @@
             <tag> x86 x86_64 Arm Linux Intel AMD Windows </tag>
             
         </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>第七篇文章</title>
+      <link href="/2022-11-26/"/>
+      <url>/2022-11-26/</url>
+      
+        <content type="html"><![CDATA[<p>建博客来第七篇文章</p>]]></content>
+      
+      
       
     </entry>
     
