@@ -29,6 +29,19 @@
     
     
     <entry>
+      <title>博客使用手册</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="http://175.178.16.173/">http://175.178.16.173</a> 或 <a href="http://heluyang.pro,文章转发的功能也好用,还有白昼/%E9%BB%91%E5%A4%9C%E6%A8%A1%E5%BC%8F%E3%80%82">http://heluyang.pro，文章转发的功能也好用，还有白昼/黑夜模式。</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>测试文章</title>
       <link href="/2022-11-20/"/>
       <url>/2022-11-20/</url>
@@ -46,44 +59,6 @@
         <tags>
             
             <tag> 个人 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>博客使用手册</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="http://175.178.16.173/">http://175.178.16.173</a> 或 <a href="http://heluyang.pro,文章转发的功能也好用,还有白昼/%E9%BB%91%E5%A4%9C%E6%A8%A1%E5%BC%8F%E3%80%82">http://heluyang.pro，文章转发的功能也好用，还有白昼/黑夜模式。</a></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>第五篇文章</title>
-      <link href="/2022-11-24/"/>
-      <url>/2022-11-24/</url>
-      
-        <content type="html"><![CDATA[<p>大力推荐学习B站王树森的课：<br><a href="https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click</a></p><p>还有莫凡python的强化学习课，有代码，下载pycharm就能跟着跑代码，上面链接是理论课，下面链接时代码教程效果展示，自己跑一遍跟着理解：<br><a href="https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click</a></p><p>具体的课程总结之后会更。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 强化学习智能决策 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 强化学习 </tag>
             
         </tags>
       
@@ -117,23 +92,23 @@
     
     
     <entry>
-      <title>如何创作一篇博客？</title>
-      <link href="/2022-11-25/"/>
-      <url>/2022-11-25/</url>
+      <title>第五篇文章</title>
+      <link href="/2022-11-24/"/>
+      <url>/2022-11-24/</url>
       
-        <content type="html"><![CDATA[<p>用Hexo，butterfly主题搭建博客<br>相信大家有时候会产生给自己造一个精致的所属空间的冲动吧，在我看到了别人优秀的博客后我就下定决心要给自己做一个精致的博客，想想只要在浏览器中搜索 <a href="https://yhl2333.github.io/">https://yhl2333.github.io</a> (目前域名，正在向<a href="http://www.heluyang.com努力奋斗/">www.heluYang.com努力奋斗</a>) 那全世界人都能搜索到我的网站，这个网页就是我的。</p><p>那么怎样创建一个博客呢，在本文中我会详细列出我的制作流程，而且大家也不必担心有一些网络技术不会导致半途而废。别急，请先大致浏览一下全文再动手搭建也不迟。</p><p>大致工作流程可以分为三部分：<br>1: 在本地新建文件夹用在有的hexo主题下修改成自己喜欢的样式（编译器用的VScode）;<br>2: 将做好的博客的文件夹通过git上传到github仓库。<br>3：在github仓库中将文件夹内容Page一下生成静态文件，这样就可以被其他人通过输入网址(如https:&#x2F;xxxxxx.github.io)查询到了（百度除外，建议用非百度引擎搜索）。<br>4：通过购买腾讯，阿里服务器可以将博客部署到他们的服务器上，并绑定买好的域名（如<a href="http://www.xxxxxxx.com),这样就可以很快速的访问了(此步有需求的人可以用,没有需求大可不看这一条,到上一步一样可以搭建)./">www.xxxxxxx.com），这样就可以很快速的访问了（此步有需求的人可以用，没有需求大可不看这一条，到上一步一样可以搭建）。</a><br>以上步骤大可以无脑进行，99%的人的选择。</p><p>下面是几个要点，需要了解：<br>1：会翻墙（也就是会魔法），没有魔法你甚至连github,git都碰不了，至于git，github，魔法，请翻看我的软硬件杂谈，里面有详细的说明。<br>2：github与git的使用，这是俩东西，本次搭建过程中可以理解为一个发送一个接收，这个跟着视频流程走就可以了，不需要去学到底咋用的，但要先在github上注册账号，而git是一款单独的软件要下载，这俩教程也是网上烂大街的。如果你会魔法的话，这俩的安装和注册真就有手就行。</p><p>好了，以上几点满足的话我们就可以开始了！</p><p>做博客的平台选择：<br>首先要弄清楚的一点是要搭建静态博客还是动态博客，本博客就是静态博客，动态博客我相信普通人是用不到的，它与前者的主要区别就是它是服务器的数据库实时发送数据来维持的，而静态博客完全是服务器发来的一个.html页面。写博客，留言等静态博客完全够用了，还有最重要一点就是静态博客不要钱，动态博客有成本，而且还是和优酷续费的那种，你说你创建那种博客？必然静态。你看到的wordpress等属于是和hexo并列同功能的，但是是搭建动态博客的，收费。</p><p>做博客的软件：<br>我可以告诉大家静态博客的制作完全可以无脑选择Hexo ，大多数人都是这么选的，上面提到的butterfly主题是什么呢，你就理解为博客网页是手机界面，是Hexo的附属包，butterfly，next等主题就相当于是手机的不同主题。这些软件怎么下？下什么版本？看下面链接，我就是按下面视频做的，适用于任何windows10以上的系统，视频中有详细操作步骤。<br><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1mU4y1j72n/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>博客界面设计：<br>当你学习完以上的视频并操作后，你会有一个Hexo默认的博客界面，并且已经上传到github中以便以后发推文实时在github中更新，此时你想的一定是想要美化界面，想要更好看的界面，这类视频在b站上都不太好找，下面是我找到的，紧接下文：<br><a href="https://www.bilibili.com/video/BV1sK411Q7S7/?spm_id_from=333.999.0.0&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1sK411Q7S7/?spm_id_from=333.999.0.0&amp;vd_source=b6da26061de3320a8170666f06381a91</a><br>去这个up的视频库里去找，有可以做成这种效果的完整系列视频。</p><p>如何去写博文：<br>这里才是你做博客的核心目的！写文章，但写博客和写记事本写word是两回事，得学，下面是up的视频：<br><a href="https://www.bilibili.com/video/BV1uW411G7nP/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1uW411G7nP/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>如果你做完这些，那么你已经达到或者超越了我的博客网站的水平，接下来我会说说你可能会产生的问题：</p><p>问题一：做博客不是免费吗，到底要不要花钱呢？<br>answer：首先，做博客，将其上传到网上，能够被其他人打开，这个过程完全是免费的，但这时，你的博客域名是<a href="https://xxxx.github.io/">https://xxxx.github.io</a> ，发现问题了吗？，就是github，github在整个过程中的作用相当于它充当了服务器的角色，任何人想要访问你的博客网站时，请求被发送到DNS进行域名解析，发现你的博客网站是存在github服务器的！而github服务器在国外，访问，将网站内容发送给访问者极其困难，慢，要挂外网的，挂外网也不会很快，你的界面设计的很复杂是要好久才能加载出所有内容，因此，开始氪金，你会问有没有不用钱的？我的回答是绝大部分人都自己去阿里云，腾讯云去买服务器和域名了，你自己细品。gitee和coding我都试过，coding与腾讯联手在朝着氪金方向发展，而Gitee则受到了国家的监管，你上传的内容在部署到服务器上时会被审核，发现有违规内容也不会告诉你哪里出了问题，而且都是国内仿照github做的仿版。有了自己的服务器和域名，相当于把你的博客数据从github服务器转移到我们自己的WLAN就可以直接访问的阿里云，腾讯云服务器了，而且这些服务器都有CDN加速，自然就可以快速加载快速打开了，但是服务器加域名费用的话差不多一年150左右，也有学生价，当然如果不想展示给别人看（不是不能，是加载慢）只想自己看自己写的话就可以停留在<a href="https://xxxx.github.io/">https://xxxx.github.io</a> 了。</p><p>问题二：为什么有的插件，包容易下载不下来，有的会警告有错？<br>answer: 建议外网和内网切换尝试下载，下载时以管理员身份运行GitBash，后VSCode；有的包下载完会报错，提示 git audit fix,但其实这是包的版本问题，想处理就按照他说的 git audit fix，不想处理或处理不了就跳过，依然能用。</p><p>问题三：如何解决数据做好的博客页面加载慢的问题呢？<br>answer：氪金，买服务器和域名，而且要备案的，不算简单；也可以把里面用到的图片存成HTML文件到达图片更快加载的效果，或者把特效关了，不过这两种解决不了根本问题。</p><p>问题四： 如果博客&#x2F;网页里放了很多图片，打开网页的时候会加载很慢，那应该如何解决呢？请去看 CDN、文件传输“图床”篇。</p><p>大致就是这些，吃晚饭去</p>]]></content>
+        <content type="html"><![CDATA[<p>大力推荐学习B站王树森的课：<br><a href="https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click</a></p><p>还有莫凡python的强化学习课，有代码，下载pycharm就能跟着跑代码，上面链接是理论课，下面链接时代码教程效果展示，自己跑一遍跟着理解：<br><a href="https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click</a></p><p>具体的课程总结之后会更。</p>]]></content>
       
       
       <categories>
           
-          <category> 软硬件杂谈 </category>
+          <category> 强化学习智能决策 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 创建博客 </tag>
+            <tag> 强化学习 </tag>
             
         </tags>
       
@@ -159,6 +134,31 @@
         <tags>
             
             <tag> CDN 图床 图像显示 带宽 云存储COS </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>如何创作一篇博客？</title>
+      <link href="/2022-11-25/"/>
+      <url>/2022-11-25/</url>
+      
+        <content type="html"><![CDATA[<p>用Hexo，butterfly主题搭建博客<br>相信大家有时候会产生给自己造一个精致的所属空间的冲动吧，在我看到了别人优秀的博客后我就下定决心要给自己做一个精致的博客，想想只要在浏览器中搜索 <a href="https://yhl2333.github.io/">https://yhl2333.github.io</a> (目前域名，正在向<a href="http://www.heluyang.com努力奋斗/">www.heluYang.com努力奋斗</a>) 那全世界人都能搜索到我的网站，这个网页就是我的。</p><p>那么怎样创建一个博客呢，在本文中我会详细列出我的制作流程，而且大家也不必担心有一些网络技术不会导致半途而废。别急，请先大致浏览一下全文再动手搭建也不迟。</p><p>大致工作流程可以分为三部分：<br>1: 在本地新建文件夹用在有的hexo主题下修改成自己喜欢的样式（编译器用的VScode）;<br>2: 将做好的博客的文件夹通过git上传到github仓库。<br>3：在github仓库中将文件夹内容Page一下生成静态文件，这样就可以被其他人通过输入网址(如https:&#x2F;xxxxxx.github.io)查询到了（百度除外，建议用非百度引擎搜索）。<br>4：通过购买腾讯，阿里服务器可以将博客部署到他们的服务器上，并绑定买好的域名（如<a href="http://www.xxxxxxx.com),这样就可以很快速的访问了(此步有需求的人可以用,没有需求大可不看这一条,到上一步一样可以搭建)./">www.xxxxxxx.com），这样就可以很快速的访问了（此步有需求的人可以用，没有需求大可不看这一条，到上一步一样可以搭建）。</a><br>以上步骤大可以无脑进行，99%的人的选择。</p><p>下面是几个要点，需要了解：<br>1：会翻墙（也就是会魔法），没有魔法你甚至连github,git都碰不了，至于git，github，魔法，请翻看我的软硬件杂谈，里面有详细的说明。<br>2：github与git的使用，这是俩东西，本次搭建过程中可以理解为一个发送一个接收，这个跟着视频流程走就可以了，不需要去学到底咋用的，但要先在github上注册账号，而git是一款单独的软件要下载，这俩教程也是网上烂大街的。如果你会魔法的话，这俩的安装和注册真就有手就行。</p><p>好了，以上几点满足的话我们就可以开始了！</p><p>做博客的平台选择：<br>首先要弄清楚的一点是要搭建静态博客还是动态博客，本博客就是静态博客，动态博客我相信普通人是用不到的，它与前者的主要区别就是它是服务器的数据库实时发送数据来维持的，而静态博客完全是服务器发来的一个.html页面。写博客，留言等静态博客完全够用了，还有最重要一点就是静态博客不要钱，动态博客有成本，而且还是和优酷续费的那种，你说你创建那种博客？必然静态。你看到的wordpress等属于是和hexo并列同功能的，但是是搭建动态博客的，收费。</p><p>做博客的软件：<br>我可以告诉大家静态博客的制作完全可以无脑选择Hexo ，大多数人都是这么选的，上面提到的butterfly主题是什么呢，你就理解为博客网页是手机界面，是Hexo的附属包，butterfly，next等主题就相当于是手机的不同主题。这些软件怎么下？下什么版本？看下面链接，我就是按下面视频做的，适用于任何windows10以上的系统，视频中有详细操作步骤。<br><a href="https://www.bilibili.com/video/BV1mU4y1j72n/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1mU4y1j72n/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>博客界面设计：<br>当你学习完以上的视频并操作后，你会有一个Hexo默认的博客界面，并且已经上传到github中以便以后发推文实时在github中更新，此时你想的一定是想要美化界面，想要更好看的界面，这类视频在b站上都不太好找，下面是我找到的，紧接下文：<br><a href="https://www.bilibili.com/video/BV1sK411Q7S7/?spm_id_from=333.999.0.0&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1sK411Q7S7/?spm_id_from=333.999.0.0&amp;vd_source=b6da26061de3320a8170666f06381a91</a><br>去这个up的视频库里去找，有可以做成这种效果的完整系列视频。</p><p>如何去写博文：<br>这里才是你做博客的核心目的！写文章，但写博客和写记事本写word是两回事，得学，下面是up的视频：<br><a href="https://www.bilibili.com/video/BV1uW411G7nP/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1uW411G7nP/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>如果你做完这些，那么你已经达到或者超越了我的博客网站的水平，接下来我会说说你可能会产生的问题：</p><p>问题一：做博客不是免费吗，到底要不要花钱呢？<br>answer：首先，做博客，将其上传到网上，能够被其他人打开，这个过程完全是免费的，但这时，你的博客域名是<a href="https://xxxx.github.io/">https://xxxx.github.io</a> ，发现问题了吗？，就是github，github在整个过程中的作用相当于它充当了服务器的角色，任何人想要访问你的博客网站时，请求被发送到DNS进行域名解析，发现你的博客网站是存在github服务器的！而github服务器在国外，访问，将网站内容发送给访问者极其困难，慢，要挂外网的，挂外网也不会很快，你的界面设计的很复杂是要好久才能加载出所有内容，因此，开始氪金，你会问有没有不用钱的？我的回答是绝大部分人都自己去阿里云，腾讯云去买服务器和域名了，你自己细品。gitee和coding我都试过，coding与腾讯联手在朝着氪金方向发展，而Gitee则受到了国家的监管，你上传的内容在部署到服务器上时会被审核，发现有违规内容也不会告诉你哪里出了问题，而且都是国内仿照github做的仿版。有了自己的服务器和域名，相当于把你的博客数据从github服务器转移到我们自己的WLAN就可以直接访问的阿里云，腾讯云服务器了，而且这些服务器都有CDN加速，自然就可以快速加载快速打开了，但是服务器加域名费用的话差不多一年150左右，也有学生价，当然如果不想展示给别人看（不是不能，是加载慢）只想自己看自己写的话就可以停留在<a href="https://xxxx.github.io/">https://xxxx.github.io</a> 了。</p><p>问题二：为什么有的插件，包容易下载不下来，有的会警告有错？<br>answer: 建议外网和内网切换尝试下载，下载时以管理员身份运行GitBash，后VSCode；有的包下载完会报错，提示 git audit fix,但其实这是包的版本问题，想处理就按照他说的 git audit fix，不想处理或处理不了就跳过，依然能用。</p><p>问题三：如何解决数据做好的博客页面加载慢的问题呢？<br>answer：氪金，买服务器和域名，而且要备案的，不算简单；也可以把里面用到的图片存成HTML文件到达图片更快加载的效果，或者把特效关了，不过这两种解决不了根本问题。</p><p>问题四： 如果博客&#x2F;网页里放了很多图片，打开网页的时候会加载很慢，那应该如何解决呢？请去看 CDN、文件传输“图床”篇。</p><p>大致就是这些，吃晚饭去</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 软硬件杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 创建博客 </tag>
             
         </tags>
       
