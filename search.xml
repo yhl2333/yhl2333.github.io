@@ -4,25 +4,38 @@
   
     
     <entry>
-      <title>关于网络的认知</title>
-      <link href="/2022-11-23/"/>
-      <url>/2022-11-23/</url>
+      <title>测试文章</title>
+      <link href="/2022-11-20/"/>
+      <url>/2022-11-20/</url>
       
-        <content type="html"><![CDATA[<p>我们每天都在登录B站，每天都在科学用网，只要手动输入 <a href="https://www.bilibili.com">https://www.bilibili.com</a>  我们就可以进入b站了，但你有想过这件事是如何实现的吗？还有当我们在做客户端，服务器相互传输信息的时候，IP和端口是干什么用的？在这篇文章中我将详细对标签中的各种名词做出解释。</p><p>首先，从我们自己的身边开始介绍，由这些引入到以上的各种名词，下面对这些名词进行形象化的解释，便于理解。</p><p>1：局域网（内网）<br>小时候家里买了个路由器，接到电脑上，电脑就有网了，接到手机上，wifi接到手机上，手机也有网了。我们就可以说，在这个路由器发射的网络信号让局部范围内有了网络，这个局部范围就称为局域网，而众多的手机，电脑，则是接入了这个局域网的设备。</p><p>2：公网：<br>现在我们家有局域网了，可别忘了小区内别人家也有路由器，他们也有自己的局域网，那么问题来了，谁给我们和他们路由器连的网？当然是一个更大的路由器了！一个更大的路由器会给你们小区所有的路由器供网。我们同样可以推出在别的小区也有着很多的家庭路由器在提供局域网，而给他们的路由器供网的则是他们小区的路由器。同理可推，给众多小区的路由器供网的是市政级别的路由器，给市政级别的路由器供网的是省的路由器。这样你就会发现整个供网系统就是一个金字塔型，由最上面的一个点向下延伸构建成一个金字塔，塔顶的点就是中央系统。而我们把小区各个用户用的路由器之上的部分称为公网（先把各家各户的路由器给用户家里局部区域供网的范围定义为局域网，把路由器之上的公网系统称为公网）。而整个金字塔的运营商（ISP）就是电信，联通，移动等公司。</p><p>有了局域网和公网的理解，我们就可以进一步解释 内网IP，公网IP 这类概念了：</p><p>3：内网IP<br>当别人问:”你电脑的IP是什么啊？”，你大惊失色，马上百度如何查看电脑IP，发现按win+R输入cmd按回车，在命令行中输入 ipconfig ，就查到了自己的电脑IP是1xx.xxx.xxx.xxx;然后你告诉那个人：我的IP是：“xxxxxxxxxxxxxxx”。<br>如果你有过以上的经历，并且认为上述语句并无毛病的话，那么说明你的理解是有问题的（你的操作完全没有任何问题）。下面我会解释为什么：<br>首先电脑IP并非固定的，电脑IP也不是电脑固有的，甚至“电脑IP”本身就是带有歧义的，它会让你认为这是电脑固有的，出厂就设定好的，但其实上不是的，电脑IP是你电脑接入局域网络的路由器来分配的！没错，如果你电脑接入了邻居家的局域网内，你就会发现电脑IP变了。所以这个IP只是临时性的。而且你家的路由器会保证它所分配的IP是各不相同的。</p><p>4：公网IP<br>公网IP是什么？和你的电脑IP有什么区别？首先我们要知道IP的作用是什么，我给你发了条微信，你给我回信，为什么信息会精准的在我们之间发送而没有发给别人呢？答：因为有IP，只要知道你我的IP，在这个大的金字塔框架中，信息就怎么也走不通。但如果你细想信息在金字塔中是怎末流动的，你会发现我发给你的信息从我的IP出发，到达我家的路由器再到达给我家路由器供网的小区路由器，小区路由器回去上面找市政级的路由器，这个市政级的路由器再找到你小区的路由器再找到你家的路由器再找到你的IP，构成了一条完整的通路，消息在这条通路之中流动。那问题来了，信息怎么知道这条通路的存在呢，信息为什么知道该怎样从当前路由器找到下一个路由器呢？它不知应该知道起点位置和终点位置吗？答：所用的路由器都有一个IP地址，你家的，你小区的，市政的，市政上面的，也就是说在公网里的路由器都有自己的IP地址，都有一个1xx.xxx.xxx.xxx的IP地址，这就是公网IP。但这些IP地址不是由上一级路由器随机分配的，都是固定好的，也就是说公网IP是固定不变的且各不相同的！这样我们也可以说在这个大的网络框架中每个网络用户的绝对地址都是由 公网IP+内网IP 唯一确定的，这是由于公网IP各不相同，局域网内各设备的IP各不相同，这样就保证了对每个用户而言 他公网IP+内网IP 各不相同。<br>我们可以做一个小实验：<br>内网IP查询：电脑cmd中输入ipconfig<br>公网IP查询： 百度内输入IP直接搜索的那串数字<br>我在E601实验室中在实验室路由器的局域网中查询这两项与我接入wifi BUAAMobile得到的两个IP地址都是不一样的。<br>内网IP不同是因为随机分配的，换个路由器就不一样了。<br>公网IP取决于你电脑所连的路由器，E601走的是小区路由器，BUAAMobile是北航自己的路由器，两个路由器都不一样，自然公网IP就不一样了！</p><p>如果还是不理解直接看下面的链接视频：<br><a href="https://www.bilibili.com/video/BV1xu411f7UW/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1xu411f7UW/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a><br><a href="https://www.bilibili.com/video/BV1DD4y127r4/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1DD4y127r4/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>为了下面的叙述，解释一下服务器：<br>5：服务器，说白了就是存储了大量数据的super电脑，有自己的IP地址。你想从服务器得到服务器内的数据，就像你想从老师那得到成绩单：你用电脑微信发送请求：“老师你能不能把期末成绩发我一下”，老师收到请求后在他的电脑上把电脑里面存的成绩单发给你，老师的电脑就相当于一台服务器。你访问www.bilibili.com 请求经过金字塔的通路传递到bilibili公司的服务器，服务器收到请求就把B站主页的数据信息原路返回发送给了你，你就看到了b站主页,之后你想看主页上了哪个视频，也是如上过程。类似于微信聊条，只不过别人回的就是你要看的视频。</p><p>到这里，你就知道了，我想查询www.bilibili.com，访问请求由内网传到公网，去访问bilibili的服务器，bilibili的服务器再将数据走路由器通道找到我的IP传回给我，我就可以看到bilibili的界面了！<br>但你有没有想过，你的请求是访问 <a href="https://www.bilibili.com">https://www.bilibili.com</a> 那这条请求访问信息怎么知道该走那条路才能到目标路由与服务器呢？<br>聪明的你显然发现了，<a href="https://www.bilibili.com">https://www.bilibili.com</a> 与bilibili的服务器IP存在着千丝万缕的关系。下面就要讲到域名，DNS。</p><p>6：DNS，你可能会说只要有了目标IP地址，我就完全可以在金字塔体系内进行各种通信了啊，那DNS是干什么吃的？万事万物都有其存在的道理，我们回想一下，你要访问bilibili，那么你就要知道bilibili的IP，就是那一大串1xx.xxx.xxx.xxx，好，我们假设你今天知道了，那你下次还能记住吗？你先记住你女朋友的手机号吧！这就是域名存在的原因，好记！就是好记住，只要访问Bilibili域名<a href="https://www.bilibili.com">https://www.bilibili.com</a> 你就能进去了。但是在金字塔体系里是通过IP找IP来实现通信的啊，因此，就有了DNS—将域名翻译成IP，就是将<a href="https://www.bilibili.com">https://www.bilibili.com</a> 翻译成1xx.xxx.xxx.xxx。具体是怎末工作的呢？DNS实际是一个服务器，你访问某个网址域名时，这个网址域名会先被送到DNS服务器（没有例外），这个服务器内记录了世界上所有的域名和IP的对应数据，查询到后就会将具体的IP传回你的电脑，你的电脑收到后自动去访问这个具体的目标网站IP，就实现了你和目标网站的互通，如果没有DNS，你就只能输入IP访问了。</p><p>7:域名等级：拿 www.bilibili.com来说，.com是顶级域名，.bilibili是一级域名，.www是二级域名。</p>]]></content>
+        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
           
-          <category> 计网与操作系统 </category>
+          <category> 杂谈 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 网络知识，IP，DNS，服务器，局域网，公网， </tag>
+            <tag> 个人 </tag>
             
         </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>博客使用手册</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="http://175.178.16.173">http://175.178.16.173</a> 或 <a href="http://heluyang.pro，文章转发的功能也好用，还有白昼/黑夜模式。">http://heluyang.pro，文章转发的功能也好用，还有白昼/黑夜模式。</a></p>]]></content>
+      
+      
       
     </entry>
     
@@ -46,6 +59,56 @@
         <tags>
             
             <tag> 个人 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>第五篇文章</title>
+      <link href="/2022-11-24/"/>
+      <url>/2022-11-24/</url>
+      
+        <content type="html"><![CDATA[<p>大力推荐学习B站王树森的课：<br><a href="https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click</a></p><p>还有莫凡python的强化学习课，有代码，下载pycharm就能跟着跑代码，上面链接是理论课，下面链接时代码教程效果展示，自己跑一遍跟着理解：<br><a href="https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click</a></p><p>具体的课程总结之后会更。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 强化学习智能决策 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 强化学习 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于网络的认知</title>
+      <link href="/2022-11-23/"/>
+      <url>/2022-11-23/</url>
+      
+        <content type="html"><![CDATA[<p>我们每天都在登录B站，每天都在科学用网，只要手动输入 <a href="https://www.bilibili.com">https://www.bilibili.com</a>  我们就可以进入b站了，但你有想过这件事是如何实现的吗？还有当我们在做客户端，服务器相互传输信息的时候，IP和端口是干什么用的？在这篇文章中我将详细对标签中的各种名词做出解释。</p><p>首先，从我们自己的身边开始介绍，由这些引入到以上的各种名词，下面对这些名词进行形象化的解释，便于理解。</p><p>1：局域网（内网）<br>小时候家里买了个路由器，接到电脑上，电脑就有网了，接到手机上，wifi接到手机上，手机也有网了。我们就可以说，在这个路由器发射的网络信号让局部范围内有了网络，这个局部范围就称为局域网，而众多的手机，电脑，则是接入了这个局域网的设备。</p><p>2：公网：<br>现在我们家有局域网了，可别忘了小区内别人家也有路由器，他们也有自己的局域网，那么问题来了，谁给我们和他们路由器连的网？当然是一个更大的路由器了！一个更大的路由器会给你们小区所有的路由器供网。我们同样可以推出在别的小区也有着很多的家庭路由器在提供局域网，而给他们的路由器供网的则是他们小区的路由器。同理可推，给众多小区的路由器供网的是市政级别的路由器，给市政级别的路由器供网的是省的路由器。这样你就会发现整个供网系统就是一个金字塔型，由最上面的一个点向下延伸构建成一个金字塔，塔顶的点就是中央系统。而我们把小区各个用户用的路由器之上的部分称为公网（先把各家各户的路由器给用户家里局部区域供网的范围定义为局域网，把路由器之上的公网系统称为公网）。而整个金字塔的运营商（ISP）就是电信，联通，移动等公司。</p><p>有了局域网和公网的理解，我们就可以进一步解释 内网IP，公网IP 这类概念了：</p><p>3：内网IP<br>当别人问:”你电脑的IP是什么啊？”，你大惊失色，马上百度如何查看电脑IP，发现按win+R输入cmd按回车，在命令行中输入 ipconfig ，就查到了自己的电脑IP是1xx.xxx.xxx.xxx;然后你告诉那个人：我的IP是：“xxxxxxxxxxxxxxx”。<br>如果你有过以上的经历，并且认为上述语句并无毛病的话，那么说明你的理解是有问题的（你的操作完全没有任何问题）。下面我会解释为什么：<br>首先电脑IP并非固定的，电脑IP也不是电脑固有的，甚至“电脑IP”本身就是带有歧义的，它会让你认为这是电脑固有的，出厂就设定好的，但其实上不是的，电脑IP是你电脑接入局域网络的路由器来分配的！没错，如果你电脑接入了邻居家的局域网内，你就会发现电脑IP变了。所以这个IP只是临时性的。而且你家的路由器会保证它所分配的IP是各不相同的。</p><p>4：公网IP<br>公网IP是什么？和你的电脑IP有什么区别？首先我们要知道IP的作用是什么，我给你发了条微信，你给我回信，为什么信息会精准的在我们之间发送而没有发给别人呢？答：因为有IP，只要知道你我的IP，在这个大的金字塔框架中，信息就怎么也走不通。但如果你细想信息在金字塔中是怎末流动的，你会发现我发给你的信息从我的IP出发，到达我家的路由器再到达给我家路由器供网的小区路由器，小区路由器回去上面找市政级的路由器，这个市政级的路由器再找到你小区的路由器再找到你家的路由器再找到你的IP，构成了一条完整的通路，消息在这条通路之中流动。那问题来了，信息怎么知道这条通路的存在呢，信息为什么知道该怎样从当前路由器找到下一个路由器呢？它不知应该知道起点位置和终点位置吗？答：所用的路由器都有一个IP地址，你家的，你小区的，市政的，市政上面的，也就是说在公网里的路由器都有自己的IP地址，都有一个1xx.xxx.xxx.xxx的IP地址，这就是公网IP。但这些IP地址不是由上一级路由器随机分配的，都是固定好的，也就是说公网IP是固定不变的且各不相同的！这样我们也可以说在这个大的网络框架中每个网络用户的绝对地址都是由 公网IP+内网IP 唯一确定的，这是由于公网IP各不相同，局域网内各设备的IP各不相同，这样就保证了对每个用户而言 他公网IP+内网IP 各不相同。<br>我们可以做一个小实验：<br>内网IP查询：电脑cmd中输入ipconfig<br>公网IP查询： 百度内输入IP直接搜索的那串数字<br>我在E601实验室中在实验室路由器的局域网中查询这两项与我接入wifi BUAAMobile得到的两个IP地址都是不一样的。<br>内网IP不同是因为随机分配的，换个路由器就不一样了。<br>公网IP取决于你电脑所连的路由器，E601走的是小区路由器，BUAAMobile是北航自己的路由器，两个路由器都不一样，自然公网IP就不一样了！</p><p>如果还是不理解直接看下面的链接视频：<br><a href="https://www.bilibili.com/video/BV1xu411f7UW/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1xu411f7UW/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a><br><a href="https://www.bilibili.com/video/BV1DD4y127r4/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1DD4y127r4/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>为了下面的叙述，解释一下服务器：<br>5：服务器，说白了就是存储了大量数据的super电脑，有自己的IP地址。你想从服务器得到服务器内的数据，就像你想从老师那得到成绩单：你用电脑微信发送请求：“老师你能不能把期末成绩发我一下”，老师收到请求后在他的电脑上把电脑里面存的成绩单发给你，老师的电脑就相当于一台服务器。你访问www.bilibili.com 请求经过金字塔的通路传递到bilibili公司的服务器，服务器收到请求就把B站主页的数据信息原路返回发送给了你，你就看到了b站主页,之后你想看主页上了哪个视频，也是如上过程。类似于微信聊条，只不过别人回的就是你要看的视频。</p><p>到这里，你就知道了，我想查询www.bilibili.com，访问请求由内网传到公网，去访问bilibili的服务器，bilibili的服务器再将数据走路由器通道找到我的IP传回给我，我就可以看到bilibili的界面了！<br>但你有没有想过，你的请求是访问 <a href="https://www.bilibili.com">https://www.bilibili.com</a> 那这条请求访问信息怎么知道该走那条路才能到目标路由与服务器呢？<br>聪明的你显然发现了，<a href="https://www.bilibili.com">https://www.bilibili.com</a> 与bilibili的服务器IP存在着千丝万缕的关系。下面就要讲到域名，DNS。</p><p>6：DNS，你可能会说只要有了目标IP地址，我就完全可以在金字塔体系内进行各种通信了啊，那DNS是干什么吃的？万事万物都有其存在的道理，我们回想一下，你要访问bilibili，那么你就要知道bilibili的IP，就是那一大串1xx.xxx.xxx.xxx，好，我们假设你今天知道了，那你下次还能记住吗？你先记住你女朋友的手机号吧！这就是域名存在的原因，好记！就是好记住，只要访问Bilibili域名<a href="https://www.bilibili.com">https://www.bilibili.com</a> 你就能进去了。但是在金字塔体系里是通过IP找IP来实现通信的啊，因此，就有了DNS—将域名翻译成IP，就是将<a href="https://www.bilibili.com">https://www.bilibili.com</a> 翻译成1xx.xxx.xxx.xxx。具体是怎末工作的呢？DNS实际是一个服务器，你访问某个网址域名时，这个网址域名会先被送到DNS服务器（没有例外），这个服务器内记录了世界上所有的域名和IP的对应数据，查询到后就会将具体的IP传回你的电脑，你的电脑收到后自动去访问这个具体的目标网站IP，就实现了你和目标网站的互通，如果没有DNS，你就只能输入IP访问了。</p><p>7:域名等级：拿 www.bilibili.com来说，.com是顶级域名，.bilibili是一级域名，.www是二级域名。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计网与操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 网络知识，IP，DNS，服务器，局域网，公网， </tag>
             
         </tags>
       
@@ -104,37 +167,11 @@
     
     
     <entry>
-      <title>第八篇文章</title>
+      <title>开发者日志</title>
       <link href="/2022-11-27/"/>
       <url>/2022-11-27/</url>
       
-        <content type="html"><![CDATA[<div class="note default simple"><p>default 开发者日志</p></div><div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴样式</p></div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-21 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases">1.0</a></p></div></div><div class='timeline-item-content'><p>本博客网站开服，作者：yhl2333<br>学校：五道口信息技术学院<br>邮箱：1652966670@qq.com</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.6">1.0 -&gt; 1.1</a></p></div></div><div class='timeline-item-content'><p>今天是11月23日，新增了留言新功能，希望大家可以对博客网站提出建设性意见或者有什么想留言的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-25 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>今天是11月25日，本着精益求精的态度，我对博客进行的大幅度的美化与修缮，成功实现了白天黑夜不同的界面显示与特效。这个过程历时整整一天，出现的问题：修改博客文件后在本地 host:4000端口打开的效果和在浏览器中服务器IP地址打开的效果不同，不同之处在于修改的部分没有显示。进过多次调试查证发现是浏览器自己的数据缓存功能，慨叹自己如此伞兵的同时也对浏览器的搜索引擎的检索能力提出质疑。浏览器的数据缓存：浏览器在加载网页之后会将内容缓存到你的设备上，当你再次访问（包括刷新网页）这个网站就会优先显示上一次加载缓存过的结果，而不是默认立即从服务器上更新全部网站内容，不然1GB的流量打开几个图片量大的网页就都没了。也就导致了网站的建设者修改过服务器上的资源后刷新网址会没有任何变化，望诸位前后端开发者引以为戒！</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-30 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>直接润回家！润的前一晚学校🐏了一个，润的当天🐏了一个。</p></div></div></div>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>博客使用手册</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<pre><code>翻开博客主页下面就是博文分类，也可以去右上角的“分类”栏去找，搜索可以直接找，列表中有音乐歌单和电影，相当于一个小型的网易云吧，没</code></pre><p>事的时候可以听一听。如果有什么想说的话也可以在右上角“留言”给我。感谢你点击了<a href="http://175.178.16.173">http://175.178.16.173</a> 或 <a href="http://heluyang.pro，文章转发的功能也好用，还有白昼/黑夜模式。">http://heluyang.pro，文章转发的功能也好用，还有白昼/黑夜模式。</a></p>]]></content>
-      
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>测试文章</title>
-      <link href="/2022-11-20/"/>
-      <url>/2022-11-20/</url>
-      
-        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+        <content type="html"><![CDATA[<div class="note default simple"><p>default 开发者日志</p></div><div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴样式</p></div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-21 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases">1.0</a></p></div></div><div class='timeline-item-content'><p>本博客网站开服，作者：yhl2333<br>学校：五道口信息技术学院<br>邮箱：1652966670@qq.com</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.6">1.0 -&gt; 1.1</a></p></div></div><div class='timeline-item-content'><p>今天是11月23日，新增了留言新功能，希望大家可以对博客网站提出建设性意见或者有什么想留言的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-25 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>今天是11月25日，本着精益求精的态度，我对博客进行的大幅度的美化与修缮，成功实现了白天黑夜不同的界面显示与特效。这个过程历时整整一天，出现的问题：修改博客文件后在本地 host:4000端口打开的效果和在浏览器中服务器IP地址打开的效果不同，不同之处在于修改的部分没有显示。进过多次调试查证发现是浏览器自己的数据缓存功能，慨叹自己如此伞兵的同时也对浏览器的搜索引擎的检索能力提出质疑。浏览器的数据缓存：浏览器在加载网页之后会将内容缓存到你的设备上，当你再次访问（包括刷新网页）这个网站就会优先显示上一次加载缓存过的结果，而不是默认立即从服务器上更新全部网站内容，不然1GB的流量打开几个图片量大的网页就都没了。也就导致了网站的建设者修改过服务器上的资源后刷新网址会没有任何变化，望诸位前后端开发者引以为戒！</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-29 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>直接润回家！润的前一晚学校🐏了一个，润的当天🐏了一个。<br>今天遇到了好多有趣的人，拼车的学姐，开出租的老父亲，做志愿奉献社会的兵哥，每个人都有着我所羡慕并且精彩的生活，<br>逢人便讲自己的憨厚懂事的高三儿子的出租车父亲，热情的和我讲述自己的孩子如何努力，如何憨厚可爱，如何高三了还孩子气，讲述的时候发自心底的开心与骄傲像极了我的父亲，虽然我不那么懂事（回家发现俺爹真的把烟戒了，挺开心的）。<br>在拼车群里拼了一天的车都没拼到去北京朝阳站的人，第二天拼到了一个林业大学的研一姐，和我一样也是趁着疫情赶紧润回家，老乡所以在一起聊了还算挺多的吧，值得感叹的是我依然还是和异性交谈九级伤残选手，也不太会表达，但单方面也没感到尴尬，如果不是一面之缘，感觉能成为朋友吧。<br>三四十号转运的人在天寒地冻的大街上冻了一个小时，怨气朝天地上了转运大巴，面对大家的埋怨挖苦，开车的军人哥忍气吞声还疯狂打趣，让车上的气氛缓和了下来，后来知道他是无偿来当志愿者的，理由是想要奉献社会，从早上七点干到晚上十点，很难想象一天中他咽下了多少波分流人员的怨气，令人打心底敬佩，无论如何，给别人多一些容忍与理解吧。<br>哈西站下了高铁，走在站里有种恍然若失的感觉，后悔，愧疚与无力感，不知不觉就泪流满面了，高中写了三年的触景生情，好像再今天才算真正的理解了<br>回家后和杭州的姐姐打了会电话，一切安好，希望今年过年的时候能见到吧<br>三点半了，该睡觉了</p></div></div></div>]]></content>
       
       
       <categories>
@@ -146,32 +183,7 @@
       
         <tags>
             
-            <tag> 个人 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>第五篇文章</title>
-      <link href="/2022-11-24/"/>
-      <url>/2022-11-24/</url>
-      
-        <content type="html"><![CDATA[<p>大力推荐学习B站王树森的课：<br><a href="https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click</a></p><p>还有莫凡python的强化学习课，有代码，下载pycharm就能跟着跑代码，上面链接是理论课，下面链接时代码教程效果展示，自己跑一遍跟着理解：<br><a href="https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click</a></p><p>具体的课程总结之后会更。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 强化学习智能决策 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 强化学习 </tag>
+            <tag> 日记 </tag>
             
         </tags>
       
