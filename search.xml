@@ -229,6 +229,25 @@
     
     
     <entry>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>测试文章</title>
       <link href="/2022-11-20/"/>
       <url>/2022-11-20/</url>
@@ -248,25 +267,6 @@
             <tag> 个人 </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
       
     </entry>
     
