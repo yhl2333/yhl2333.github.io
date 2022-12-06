@@ -8,7 +8,7 @@
       <link href="/TcpUdp/"/>
       <url>/TcpUdp/</url>
       
-        <content type="html"><![CDATA[<p>&emsp;&emsp;套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字，指出服务器端套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;如果服务器端接收到了，之后客户端的套接字会收到服务器的套接字的已连接信息(也是系统自己操做的)，并发出connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能接收，不能发送，这就意味着服务器不能回话！怎么办呢？再在服务器端创造一个套接字，但再创造一个套接字的话就意味着上面的所有步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，它知道通道另一端的客户端套接字的IP与端口，可以直接回复信息（客户端的tcpSocket给服务端的tcpServer发信息，服务器端的tcpSocket给客户端的tcpSocket回话，实现双向通信，相当于客户端给服务器打电话，客户端这边一个人又能听又能说tcpSocket，服务器这边站着俩人，一个哑巴tcpServer，一个聋子tcpSocket，但俩人合体一切正常）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。</p><p>客户端cpp代码：</p><h1 id="include-“clientwidget-h”"><a href="#include-“clientwidget-h”" class="headerlink" title="include “clientwidget.h”"></a>include “clientwidget.h”</h1><h1 id="include-“ui-clientwidget-h”"><a href="#include-“ui-clientwidget-h”" class="headerlink" title="include “ui_clientwidget.h”"></a>include “ui_clientwidget.h”</h1><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <QHostAddress></h1><p>ClientWidget::ClientWidget(QWidget *parent) :<br>    QWidget(parent),<br>    ui(new Ui::ClientWidget)<br>{<br>    ui-&gt;setupUi(this);<br>    tcpSocket = NULL;<br>    tcpSocket = new QTcpSocket(this);</p><pre><code>connect(tcpSocket, &amp;QTcpSocket::connected,        [=]()        &#123;            ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);        &#125;        );connect(tcpSocket, &amp;QTcpSocket::readyRead,        [=]()        &#123;            QByteArray array = tcpSocket-&gt;readAll();            ui-&gt;textread-&gt;append(array);        &#125;        );</code></pre><p>}</p><p>ClientWidget::~ClientWidget()<br>{<br>    delete ui;<br>}</p><p>void ClientWidget::on_Buttonconnect_clicked()<br>{<br>    QString ip = ui-&gt;lineEditIP-&gt;text();<br>    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();<br>    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>}</p><p>void ClientWidget::on_ButtonSend_clicked()<br>{<br>    QString str =ui-&gt;textBwrite-&gt;toPlainText();<br>    tcpSocket-&gt;write(str.toUtf8().data());</p><p>}</p><p>void ClientWidget::on_ButtonClose_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    tcpSocket-&gt;disconnectFromHost();</p><pre><code>tcpSocket = NULL;</code></pre><p>}</p><p>服务器.cpp代码</p><h1 id="include-“widget-h”"><a href="#include-“widget-h”" class="headerlink" title="include “widget.h”"></a>include “widget.h”</h1><h1 id="include-“ui-widget-h”"><a href="#include-“ui-widget-h”" class="headerlink" title="include “ui_widget.h”"></a>include “ui_widget.h”</h1><p>Widget::Widget(QWidget *parent)<br>    : QWidget(parent)<br>    , ui(new Ui::Widget)<br>{<br>    ui-&gt;setupUi(this);</p><pre><code>tcpServer = NULL;tcpSocket = NULL;tcpServer = new QTcpServer(this);tcpServer-&gt;listen(QHostAddress::Any,8888);setWindowTitle(&quot;服务器： 8888&quot;);connect(tcpServer,&amp;QTcpServer::newConnection,        [=]()        &#123;            tcpSocket = tcpServer-&gt;nextPendingConnection();            QString ip= tcpSocket-&gt;peerAddress().toString();            qint64 port= tcpSocket-&gt;peerPort();            QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);            ui-&gt;textread-&gt;setText(temp);            connect(tcpSocket, &amp;QTcpSocket::readyRead,                    [=]()                    &#123;                        QByteArray array = tcpSocket-&gt;readAll();                        ui-&gt;textread-&gt;append(array);                    &#125;                    );        &#125;        );</code></pre><p>}</p><p>Widget::~Widget()<br>{<br>    delete ui;<br>}</p><p>void Widget::on_Buttonsend_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    QString str =ui-&gt;textwrite-&gt;toPlainText();<br>    tcpSocket-&gt;write(str.toUtf8().data());<br>}</p><p>void Widget::on_Buttonclose_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    tcpSocket-&gt;disconnectFromHost();<br>    tcpSocket-&gt;close();<br>    tcpSocket = NULL;<br>}</p><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+        <content type="html"><![CDATA[<p>&emsp;&emsp;套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字，指出服务器端套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;如果服务器端接收到了，之后客户端的套接字会收到服务器的套接字的已连接信息(也是系统自己操做的)，并发出connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能接收，不能发送，这就意味着服务器不能回话！怎么办呢？再在服务器端创造一个套接字，但再创造一个套接字的话就意味着上面的所有步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，它知道通道另一端的客户端套接字的IP与端口，可以直接回复信息（客户端的tcpSocket给服务端的tcpServer发信息，服务器端的tcpSocket给客户端的tcpSocket回话，实现双向通信，相当于客户端给服务器打电话，客户端这边一个人又能听又能说tcpSocket，服务器这边站着俩人，一个哑巴tcpServer，一个聋子tcpSocket，但俩人合体一切正常）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。</p><p>客户端cpp代码：</p><h1 id="include-“clientwidget-h”"><a href="#include-“clientwidget-h”" class="headerlink" title="include “clientwidget.h”"></a>include “clientwidget.h”</h1><h1 id="include-“ui-clientwidget-h”"><a href="#include-“ui-clientwidget-h”" class="headerlink" title="include “ui_clientwidget.h”"></a>include “ui_clientwidget.h”</h1><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <QHostAddress></h1><p>ClientWidget::ClientWidget(QWidget *parent) :<br>    QWidget(parent),<br>    ui(new Ui::ClientWidget)<br>{<br>    ui-&gt;setupUi(this);<br>    tcpSocket = NULL;<br>    tcpSocket = new QTcpSocket(this);</p><pre><code>connect(tcpSocket, &amp;QTcpSocket::connected,        [=]()        &#123;            ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);        &#125;        );connect(tcpSocket, &amp;QTcpSocket::readyRead,        [=]()        &#123;            QByteArray array = tcpSocket-&gt;readAll();            ui-&gt;textread-&gt;append(array);        &#125;        );</code></pre><p>}</p><p>ClientWidget::~ClientWidget()<br>{<br>    delete ui;<br>}</p><p>void ClientWidget::on_Buttonconnect_clicked()<br>{<br>    QString ip = ui-&gt;lineEditIP-&gt;text();<br>    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();<br>    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>}</p><p>void ClientWidget::on_ButtonSend_clicked()<br>{<br>    QString str =ui-&gt;textBwrite-&gt;toPlainText();<br>    tcpSocket-&gt;write(str.toUtf8().data());</p><p>}</p><p>void ClientWidget::on_ButtonClose_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    tcpSocket-&gt;disconnectFromHost();</p><pre><code>tcpSocket = NULL;</code></pre><p>}</p><p>服务器.cpp代码</p><h1 id="include-“widget-h”"><a href="#include-“widget-h”" class="headerlink" title="include “widget.h”"></a>include “widget.h”</h1><h1 id="include-“ui-widget-h”"><a href="#include-“ui-widget-h”" class="headerlink" title="include “ui_widget.h”"></a>include “ui_widget.h”</h1><p>Widget::Widget(QWidget *parent)<br>    : QWidget(parent)<br>    , ui(new Ui::Widget)<br>{<br>    ui-&gt;setupUi(this);</p><pre><code>tcpServer = NULL;tcpSocket = NULL;tcpServer = new QTcpServer(this);tcpServer-&gt;listen(QHostAddress::Any,8888);setWindowTitle(&quot;服务器： 8888&quot;);connect(tcpServer,&amp;QTcpServer::newConnection,        [=]()        &#123;            tcpSocket = tcpServer-&gt;nextPendingConnection();            QString ip= tcpSocket-&gt;peerAddress().toString();            qint64 port= tcpSocket-&gt;peerPort();            QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);            ui-&gt;textread-&gt;setText(temp);            connect(tcpSocket, &amp;QTcpSocket::readyRead,                    [=]()                    &#123;                        QByteArray array = tcpSocket-&gt;readAll();                        ui-&gt;textread-&gt;append(array);                    &#125;                    );        &#125;        );</code></pre><p>}</p><p>Widget::~Widget()<br>{<br>    delete ui;<br>}</p><p>void Widget::on_Buttonsend_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    QString str =ui-&gt;textwrite-&gt;toPlainText();<br>    tcpSocket-&gt;write(str.toUtf8().data());<br>}</p><p>void Widget::on_Buttonclose_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    tcpSocket-&gt;disconnectFromHost();<br>    tcpSocket-&gt;close();<br>    tcpSocket = NULL;<br>}</p><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
@@ -254,6 +254,31 @@
     
     
     <entry>
+      <title>测试文章</title>
+      <link href="/2022-11-20/"/>
+      <url>/2022-11-20/</url>
+      
+        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 个人 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>强化学习资源</title>
       <link href="/2022-11-24/"/>
       <url>/2022-11-24/</url>
@@ -273,6 +298,25 @@
             <tag> 强化学习 </tag>
             
         </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
       
     </entry>
     
@@ -304,25 +348,6 @@
     
     
     <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>操作系统的发展简史</title>
       <link href="/x86/"/>
       <url>/x86/</url>
@@ -340,31 +365,6 @@
         <tags>
             
             <tag> x86 x86_64 Arm  Intel AMD </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>测试文章</title>
-      <link href="/2022-11-20/"/>
-      <url>/2022-11-20/</url>
-      
-        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 个人 </tag>
             
         </tags>
       
