@@ -33,7 +33,7 @@
       <link href="/Tcp/"/>
       <url>/Tcp/</url>
       
-        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字，指出服务器端套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;如果服务器端接收到了，之后客户端的套接字会收到服务器的套接字的已连接信息(也是系统自己操做的)，并发出connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能接收，不能发送，这就意味着服务器不能回话！怎么办呢？再在服务器端创造一个套接字，但再创造一个套接字的话就意味着上面的所有步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，它知道通道另一端的客户端套接字的IP与端口，可以直接回复信息（客户端的tcpSocket给服务端的tcpServer发信息，服务器端的tcpSocket给客户端的tcpSocket回话，实现双向通信，相当于客户端给服务器打电话，客户端这边一个人又能听又能说tcpSocket，服务器这边站着俩人，一个哑巴tcpServer，一个聋子tcpSocket，但俩人合体一切正常）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字</p><p>客户端cpp代码：</p><h1 id="include-“clientwidget-h”"><a href="#include-“clientwidget-h”" class="headerlink" title="include “clientwidget.h”"></a>include “clientwidget.h”</h1><h1 id="include-“ui-clientwidget-h”"><a href="#include-“ui-clientwidget-h”" class="headerlink" title="include “ui_clientwidget.h”"></a>include “ui_clientwidget.h”</h1><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <QHostAddress></h1><p>ClientWidget::ClientWidget(QWidget *parent) :<br>    QWidget(parent),<br>    ui(new Ui::ClientWidget)<br>{<br>    ui-&gt;setupUi(this);<br>    tcpSocket = NULL;<br>    tcpSocket = new QTcpSocket(this);</p><pre><code>connect(tcpSocket, &amp;QTcpSocket::connected,        [=]()        &#123;            ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);        &#125;        );connect(tcpSocket, &amp;QTcpSocket::readyRead,        [=]()        &#123;            QByteArray array = tcpSocket-&gt;readAll();            ui-&gt;textread-&gt;append(array);        &#125;        );</code></pre><p>}</p><p>ClientWidget::~ClientWidget()<br>{<br>    delete ui;<br>}</p><p>void ClientWidget::on_Buttonconnect_clicked()<br>{<br>    QString ip = ui-&gt;lineEditIP-&gt;text();<br>    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();<br>    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>}</p><p>void ClientWidget::on_ButtonSend_clicked()<br>{<br>    QString str =ui-&gt;textBwrite-&gt;toPlainText();<br>    tcpSocket-&gt;write(str.toUtf8().data());</p><p>}</p><p>void ClientWidget::on_ButtonClose_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    tcpSocket-&gt;disconnectFromHost();</p><pre><code>tcpSocket = NULL;</code></pre><p>}</p><p>服务器.cpp代码</p><h1 id="include-“widget-h”"><a href="#include-“widget-h”" class="headerlink" title="include “widget.h”"></a>include “widget.h”</h1><h1 id="include-“ui-widget-h”"><a href="#include-“ui-widget-h”" class="headerlink" title="include “ui_widget.h”"></a>include “ui_widget.h”</h1><p>Widget::Widget(QWidget *parent)<br>    : QWidget(parent)<br>    , ui(new Ui::Widget)<br>{<br>    ui-&gt;setupUi(this);</p><pre><code>tcpServer = NULL;tcpSocket = NULL;tcpServer = new QTcpServer(this);tcpServer-&gt;listen(QHostAddress::Any,8888);setWindowTitle(&quot;服务器： 8888&quot;);connect(tcpServer,&amp;QTcpServer::newConnection,        [=]()        &#123;            tcpSocket = tcpServer-&gt;nextPendingConnection();            QString ip= tcpSocket-&gt;peerAddress().toString();            qint64 port= tcpSocket-&gt;peerPort();            QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);            ui-&gt;textread-&gt;setText(temp);            connect(tcpSocket, &amp;QTcpSocket::readyRead,                    [=]()                    &#123;                        QByteArray array = tcpSocket-&gt;readAll();                        ui-&gt;textread-&gt;append(array);                    &#125;                    );        &#125;        );</code></pre><p>}</p><p>Widget::~Widget()<br>{<br>    delete ui;<br>}</p><p>void Widget::on_Buttonsend_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    QString str =ui-&gt;textwrite-&gt;toPlainText();<br>    tcpSocket-&gt;write(str.toUtf8().data());<br>}</p><p>void Widget::on_Buttonclose_clicked()<br>{<br>    if(NULL == tcpSocket)<br>    {<br>        return;<br>    }<br>    tcpSocket-&gt;disconnectFromHost();<br>    tcpSocket-&gt;close();<br>    tcpSocket = NULL;<br>}</p><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字，指出服务器端套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;如果服务器端接收到了，之后客户端的套接字会收到服务器的套接字的已连接信息(也是系统自己操做的)，并发出connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能接收，不能发送，这就意味着服务器不能回话！怎么办呢？再在服务器端创造一个套接字，但再创造一个套接字的话就意味着上面的所有步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，它知道通道另一端的客户端套接字的IP与端口，可以直接回复信息（客户端的tcpSocket给服务端的tcpServer发信息，服务器端的tcpSocket给客户端的tcpSocket回话，实现双向通信，相当于客户端给服务器打电话，客户端这边一个人又能听又能说tcpSocket，服务器这边站着俩人，一个哑巴tcpServer，一个聋子tcpSocket，但俩人合体一切正常）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
@@ -58,7 +58,7 @@
       <link href="/UDP/"/>
       <url>/UDP/</url>
       
-        <content type="html"><![CDATA[<p><img src="/img/UDP.png" alt="UDP原理"><br>步骤：<br>&emsp;&emsp;1：实例化两个套接字(服务器和客户端的套接字都一样，不用再向TCP一样分serveSocket,TcpSocket)<br>&emsp;&emsp;2：接收方bind() 自己的端口port，IP<br>&emsp;&emsp;3：收发<br>&emsp;&emsp;4：关闭套接字。</p><p>UDP与TCP区别：<br>&emsp;&emsp;UDP通信过程中，每次都需要指定数据接收端的IP和端口，和发快递差不多，每次发都要填地址；<br>TCP则三次握手建立通道后每次发送就不必指定端口和IP了，在通道中就发送了。;和打电话一样，电话一旦接通就随便唠了。<br>UDP：udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);<br>TCP：tcpSocket-&gt;write(str.toUtf8().data())<br>从两者的发送可以看出UDP每次发送都要填IP与Port，TCP建立完通道后就不用管了。</p><p>&emsp;&emsp;UDP通信不需要建立连接，因此不需要进行 connect() 操作。TCP则又是newconnection 又是connected来确保连接畅通。</p><p>&emsp;&emsp;TCP是以字节流的形式传输数据，因此会出现粘包现象，UDP则以数据包的形式传输。</p><p>&emsp;&emsp;使用UDP进行通信，服务器和客户端的处理步骤比TCP要简单很多，并且两端是对等的(通信的处理流程几乎是一样的)，也就是说并没有严格意义上的客户端和服务器端。但哪一端是接收数据的角色，那么这个接收端就必须绑定（bind）一个固定的端口，因为起码得告诉发数据的人往哪里发吧。如果某一端不需要接收数据，这个绑定操作就可以省略不写了，通信的套接字会自动绑定一个随机端口，并且随着数据发送过去，在接收端recv()函数中会解析出发送者的IP与Port，这样接收者也能给发送者回话了！这点和TCP差不多。不过这种只绑定一端的做法的代价是，绑定方无法给未绑定方发消息，因为绑定方是不知道未绑定方的IP与Port的（未绑定系统随机非配发送端口），也就是说第一次发送的方向是固定的！这点和TCP一样，用TCP协议也基本上默认了第一次发送方向固定这一条件。怎么实现向QQ一样两边谁先发都可以的通信呢？两边都bind()就可以了啊！这样两边的发送地址都固定了，都知道对方的IP，port的情况下，谁先发都可以。</p><p>&emsp;&emsp;TCP是一定会完整，准确的发送数据的，粘包可以自己解决！UDP不对收到的数据进行排序，在UDP报文的首部中并没有关于数据顺序的信息，UDP对接收到的数据报不回复确认信息，发送端不知道数据是否被正确接收，也不会重发数据。如果发生了数据丢失，不存在丢一半的情况，如果丢当前这个数据包就全部丢失了。因此，UDP简单，随意的代价就是可能会数据丢失。</p><p>附上UDP.cpp代码，客户端和服务器共用一个代码，都bind()了：</p><h1 id="include-“client-h”"><a href="#include-“client-h”" class="headerlink" title="include “client.h”"></a>include “client.h”</h1><h1 id="include-“ui-client-h”"><a href="#include-“ui-client-h”" class="headerlink" title="include “ui_client.h”"></a>include “ui_client.h”</h1><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <QHostAddress></h1><p>client::client(QWidget *parent) :<br>    QWidget(parent),<br>    ui(new Ui::client)<br>{<br>    ui-&gt;setupUi(this);<br>    udpSocket = new QUdpSocket(this);<br>    udpSocket-&gt;bind(8887);<br>    setWindowTitle(“端口8887”);<br>    connect(udpSocket,&amp;QUdpSocket::readyRead,this,&amp;client::dealMsg);</p><p>}</p><p>client::~client()<br>{<br>    delete ui;<br>}</p><p>void client::dealMsg()<br>{<br>    char buf[ 1024 ]={0};<br>    QHostAddress cliAddr;<br>    quint16 port;<br>    qint64 len =udpSocket-&gt;readDatagram(buf, sizeof(buf),&amp;cliAddr, &amp;port);<br>    if(len&gt;0)<br>    {<br>        QString str = QString(“{ % 1: % 2} % 3”)<br>                .arg(cliAddr.toString())<br>                .arg(port)<br>                .arg(buf);<br>        ui-&gt;textEdit-&gt;setText(str);<br>    }<br>}<br>void client::on_Buttonsend_clicked()<br>{<br>    QString ip = ui-&gt;lineIP-&gt;text();<br>    qint16 port = ui-&gt;lineport-&gt;text().toInt();<br>    QString str =ui-&gt;textEdit-&gt;toPlainText();<br>    udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);</p><p>}</p>]]></content>
+        <content type="html"><![CDATA[<p><img src="/img/UDP.png" alt="UDP原理"><br>步骤：<br>&emsp;&emsp;1：实例化两个套接字(服务器和客户端的套接字都一样，不用再向TCP一样分serveSocket,TcpSocket)<br>&emsp;&emsp;2：接收方bind() 自己的端口port，IP<br>&emsp;&emsp;3：收发<br>&emsp;&emsp;4：关闭套接字。</p><p>UDP与TCP区别：<br>&emsp;&emsp;UDP通信过程中，每次都需要指定数据接收端的IP和端口，和发快递差不多，每次发都要填地址；<br>TCP则三次握手建立通道后每次发送就不必指定端口和IP了，在通道中就发送了。;和打电话一样，电话一旦接通就随便唠了。<br>UDP：udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);<br>TCP：tcpSocket-&gt;write(str.toUtf8().data())<br>从两者的发送可以看出UDP每次发送都要填IP与Port，TCP建立完通道后就不用管了。</p><p>&emsp;&emsp;UDP通信不需要建立连接，因此不需要进行 connect() 操作。TCP则又是newconnection 又是connected来确保连接畅通。</p><p>&emsp;&emsp;TCP是以字节流的形式传输数据，因此会出现粘包现象，UDP则以数据包的形式传输。</p><p>&emsp;&emsp;使用UDP进行通信，服务器和客户端的处理步骤比TCP要简单很多，并且两端是对等的(通信的处理流程几乎是一样的)，也就是说并没有严格意义上的客户端和服务器端。但哪一端是接收数据的角色，那么这个接收端就必须绑定（bind）一个固定的端口，因为起码得告诉发数据的人往哪里发吧。如果某一端不需要接收数据，这个绑定操作就可以省略不写了，通信的套接字会自动绑定一个随机端口，并且随着数据发送过去，在接收端recv()函数中会解析出发送者的IP与Port，这样接收者也能给发送者回话了！这点和TCP差不多。不过这种只绑定一端的做法的代价是，绑定方无法给未绑定方发消息，因为绑定方是不知道未绑定方的IP与Port的（未绑定系统随机非配发送端口），也就是说第一次发送的方向是固定的！这点和TCP一样，用TCP协议也基本上默认了第一次发送方向固定这一条件。怎么实现向QQ一样两边谁先发都可以的通信呢？两边都bind()就可以了啊！这样两边的发送地址都固定了，都知道对方的IP，port的情况下，谁先发都可以。</p><p>&emsp;&emsp;TCP是一定会完整，准确的发送数据的，粘包可以自己解决！UDP不对收到的数据进行排序，在UDP报文的首部中并没有关于数据顺序的信息，UDP对接收到的数据报不回复确认信息，发送端不知道数据是否被正确接收，也不会重发数据。如果发生了数据丢失，不存在丢一半的情况，如果丢当前这个数据包就全部丢失了。因此，UDP简单，随意的代价就是可能会数据丢失。</p><p>附上UDP.cpp代码，客户端和服务器共用一个代码，都bind()了：</p><pre><code>#include &quot;client.h&quot;#include &quot;ui_client.h&quot;#include &lt;QHostAddress&gt;client::client(QWidget *parent) :    QWidget(parent),    ui(new Ui::client)&#123;    ui-&gt;setupUi(this);    udpSocket = new QUdpSocket(this);    udpSocket-&gt;bind(8887);    setWindowTitle(&quot;端口8887&quot;);    connect(udpSocket,&amp;QUdpSocket::readyRead,this,&amp;client::dealMsg);&#125;client::~client()&#123;    delete ui;&#125;void client::dealMsg()&#123;    char buf[ 1024 ]=&#123;0&#125;;    QHostAddress cliAddr;    quint16 port;    qint64 len =udpSocket-&gt;readDatagram(buf, sizeof(buf),&amp;cliAddr, &amp;port);    if(len&gt;0)    &#123;        QString str = QString(&quot;&#123;%1:%2&#125; %3&quot;)                .arg(cliAddr.toString())                .arg(port)                .arg(buf);        ui-&gt;textEdit-&gt;setText(str);    &#125;&#125;void client::on_Buttonsend_clicked()&#123;    QString ip = ui-&gt;lineIP-&gt;text();    qint16 port = ui-&gt;lineport-&gt;text().toInt();    QString str =ui-&gt;textEdit-&gt;toPlainText();    udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);&#125;</code></pre>]]></content>
       
       
       <categories>
@@ -204,31 +204,6 @@
     
     
     <entry>
-      <title>为什么毕业生越来越难了?</title>
-      <link href="/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/"/>
-      <url>/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;如果年度词汇可以选负面词汇的话，我相信，这个字只会取自两个方面：<br>1：疫情下经济低迷与人的精神问题<br>2：卷（多多少少带有本人的个人恩怨，但不影响与第一个方面并列）</p><p>&emsp;&emsp;我们为什么越来越难找工作了呢？为什么考研考公还在水涨船高？这种病态的考试应试系统为全社会都看在眼里却默不作声？</p><p>第一个问题：首先工作为什么越来越难找？<br>&emsp;&emsp;我感觉随便找个大学生出来他都能答出来：疫情之下经济低迷，各行各业（餐饮、零售、交通、旅游、等等等等）受到牵连，社会流动资金缩水，岗位缩招。拿互联网公司来举例，大公司因为资金短缺问题都能把整个研发部门给裁掉，没有经济来促进行业发展，招聘的毕业生自然而然就少了。<br>总之蛋糕变小了，能养的起的人数也减少了。</p><p>第二个问题:为什么考研考公水涨船高？<br>&emsp;&emsp;在回答这个问题的同时，先回想一下你的父母是不是曾经说过当年考上大学是多么多么困难，考上了就会分配工作以后生活无忧等等。<br>第一个关键点出现了，我们感觉现在好像考个大学有手就行，但当时非也，这种现象和当时的社会经济与教育资源有关，南方我不知道，北方大部分父母在小学初中毕业以后就会辍学种地，去城市打工减少家里的压力，一家好多个孩子也就会有一个或两个去读高中。好，现在都还很容易理解，那么列出1995年和2022年的高等教育适龄入学率（即同龄人中，上大学人数比总同龄人数）：<br>1995年：5.3%<br>2020年：54%<br>对比周边国家：<br><img src="/img/2.png" alt=""><br>&emsp;&emsp;从上面的数据不难看出，从前的大学教育是精英式教育，现在的大学教育是大众式教育。<br>&emsp;&emsp;那么什么时候开始有计划性的扩招了呢？<br>&emsp;&emsp;一切社会问题的产生永远都避不开一个要素：经济。毕竟整个地球史上就没有生物会和钱过不去的。<br>&emsp;&emsp;首先阐述一个事实，教育和经济是双向互补的。<br>&emsp;&emsp;去问问你的父母，1999年很重大的一件事，下岗潮。那一年国内市场经济下行，当年产生了1000万的下岗工人（没上大学的还是有充足的岗位去处的），年轻人不进大学，就会和全体工人一起竞争，在市场有限的条件下，社会矛盾会激化，因此就决定让更多学生进入大学。大学生进入大学，除了缓解当年的就业，下岗在就业的压力，还可以带动经济的发展，因为父母在看到扩招之前的大学生是如何风光，砸锅卖铁也都会供孩子上大学，这样本来停滞的经济也就开始流动起来，比如学生的住宿费，伙食费，可以促进学校引入师资和校舍和当地商业的发展，小学，初中，高中的大规模兴办，教师行业的兴起（你细品什么时候高中大学开始收学费的），学生的出行可以给铁路的建设提供资金支持，铁路建成则促进了各地经济的快速发展，因此这是当时市场经济的一剂强心针。<br>&emsp;&emsp;于是乎在1998年15大上就决定大学扩招，决定在2010年将上面的高等教育适龄入学率扩大到15%。于是1999年就是“大学扩招”年。但令人啧啧称奇的是这个计划在2003年就达到了15%，整整提前了7年。<br>我们可以看出，当年的大学扩招成效：<br>1、成功缓解了下岗潮的压力<br>2、成功促进了经济的发展，在2002年就达到了本来计划在2010年的15%大学入学率，足以证明这项举措是多么有成效。</p><p>&emsp;&emsp;好，再转向今年的考研考公，如果你观察数据可以发现，考研人数暴涨：<br><img src="/img/3.jpg" alt=""><br>&emsp;&emsp;2021年450w，2022年540w，足见经济形势的困顿，暴涨的背后伴随着教育部对研究生进行了扩招，同样的经济困顿，同样的扩招，此时此刻恰如彼时彼刻。<br>那如何处理当今的问题呢？<br>&emsp;&emsp;答：—“抄作业”—</p><p>&emsp;&emsp;打算直接复刻1999荣光是吧。当年的缓兵之计卓见成效，但如今的缓兵之计则不太行。区别在于：<br>1、缓兵的这几年经济并没有增长，就业岗位不增反减。经济没有增长的原因是疫情下的政策束手束脚，经济必然后退；还有就是Trump的贸易战，（有人说Trump贸易战输了我就想笑，贸易战确实是伤敌1000自损800，但问题是1000对人家来说不痛不痒，800对我们来说如数家珍），我国经济分为国内市场经济和海外进出口经济，国内市场经济被疫情拖累，海外进出口经济则被Trump咬住。这两方面导致了经济没有活力，导致经济下行<br>2、当1999就算扩招了，但绝大多数人还是上不了大学，和绝大部分适龄青年依旧是毫无关系，构不成激烈的竞争。现如今是却一个几乎全民大学的时代，扩招则就象征着内卷走向合理化与强制化，并且“读书改变命运”，“努力就会有回报”，儒家文化等信条深入人心，大家都想往上面发展，助长了内卷。但如今经济和岗位并没有增加，反倒是硕士研究生爆表，本科生无处可去。社会上的饭碗依旧是那么几个，反而就业，待就业人数两年内凭空增加了800w，再加上下一年的1000w毕业生，将近2000w。而且还呈现逐年积累的趋势，该如何解决？无法解决，但不管所有人愿不愿意，这2000w迟早会被消化掉，怎么消化掉？不知道，反正能消化掉就是了。</p><p>&emsp;&emsp;因此，这次的“抄作业”显然大局已定。除此之外，这种政策也导致了就业人员，准就业人员，预就业人员（我自己），产生了眼高手低的通病。<br>&emsp;&emsp;为什么感觉毕业待遇一年不如一年？很简单，人多了，均摊就少了。“之前的毕业生能拿到那么多工资，那我也应该拿那么多。”虽然我也很想对别人这么说，我自己也会这样去想，但事实是，就是我们眼高手低，自己不配。我们毕业证书的含金量，在前人看来大学很不错，就是天之骄子，这也是为什么我们会从长辈那里得到赞誉的原因，但实际上是，我们这个时代毕业人数比他们那个时候增加了10倍，但社会的饭碗只增加了三倍，本科毕业，硕士毕业的含金量就被稀释掉了。整个社会上的硕士博士数量逐年增加，硕士博士学历的含金量也必然逐年被稀释，上面有政策有要求各单位扩招保障毕业生就业率，但企业准入门槛还是硕士没有变，怎么办？把硕士工资稀释掉呗，因此现在硕士的底薪在逐年减少，这样才能多养几个员工。<br>&emsp;&emsp;自己的底薪被稀释，对于近几年在默默努力，疯狂内卷的社会成员来说，大部分人们的努力，是绝对得不到他们预想中的回报的。劳资努力了好几年，不拿高薪，对得起自己这几年的努力吗？很遗憾，我们的努力，是时势所趋，并非时势所需。我们所学的高考知识，本科知识，考研考公的内容，可以说和今后的工作内容完美脱轨。企业给高薪资，涨薪资的条件是你有“工作”能力，而不是应试能力，因此内卷了却没有得到回报的人大有人在，郁郁寡欢的人大有人在，社会矛盾只会积重难返。但是不内卷躺平吗？只会更惨。</p><p>&emsp;&emsp;最后我们再来分析一下人口结构：<br>&emsp;&emsp;2002年15%的大学入学率，剩下的85%在干什么？<br>&emsp;&emsp;2020年55%的大学入学率，剩下的45%在干什么？<br>&emsp;&emsp;2002年产业结构主打的是轻工业，重工业与农业，2020年也还是轻工业，重工业与农业，产业结构没转型吗？转了，但不太多。那以前初高中毕业进厂干的活现在谁干了？答：本科生。以前本科生干的活现在谁干了？答：985，211毕业生。我们的学历都在提升，但所干的工作内容，可以说没有变化。相比2002，他们起码还有一技之长，虽然学历不高，但人家的技能是真能养活自己，而我们，什么都会，又什么都不会，大学打着培养融会贯通的高等人才的旗号，让我们去学遍自然科学，从这一刻开始，我们就开始了眼高手低的第一步，谁是融会贯通的高等人才？我融会贯通干什么？反正我肯定不是，我感觉和自然科学有关的课对我来说屁用没有。因此我的评价是：无用功盛行，浪费年轻人的生命，政策已经弊大于利了。到最后我们走进社会干的和先人干的没啥区别（因为向高新科技，制造业的产业转型太慢了），我们花了更长的时间在学海里兜兜转转还是回到了前人的起点，那我们做出的努力和耗费的生命还有什么意义？但我们的国度并不缺聪明人，可能我们人人都比马克思聪明，但让聪明人变傻是很简单的，我是不信马克思在经历了高考大学以后还能写出资本论，因为他得在大学毕业才步入社会，才有时间去思考。</p><p>&emsp;&emsp;由于我们的长辈基本没学历或者是普通本科，我们看到他们现在也还活得不错，小康水平，导致我们会产生本科毕业起码在十八线县城也能活得不错吧，我学历比我爸妈高，他们在十八线小县城，那我们应该可以在四线，五线城市过一个简朴富足的生活了吧！这就错了呀，大错特错，我们学历是高了，大家学历都高了，按宏观数据来说，现在的普通本科甚至远远对标不上当时的大专，放在2002年我们也还是进不去大学的那一批，随着大学扩招，本科扩招，研究生扩招，我们只不过空有知识，空有学历，但社会上的碗筷并没有多出多少。因此，我们学识远超我们的父母，我们的学历远超我们的父母，但我们能够得到的生活质量，可能还远远不如。<br>&emsp;&emsp;别嘲笑我们的老爸老妈没文化，放到1995年，我们也那样。</p><p>&emsp;&emsp;之后的几年还会时艰难的几年，Trump大选成功，贸易战经济战也在加速，甚至USA在重返月球，新一轮太空竞赛很难不开启。同时后疫情时代人们的精神状态，南北贫富差距进一步增大，低迷的生育率（东北三省生育率碾压韩国喜提世界倒数第一，黑龙江更是站在了世界之巅）。房地产的经济泡沫什么时候会爆，这些都没有定数。但和之前几年的飞速发展相比，之后的几年甚至十年应该会是最严峻的十年了。</p><p>&emsp;&emsp;这样第二个问题就解决完了。</p><p>&emsp;&emsp;至于第三个问题，算了，不利于团结的话不说了。<br>&emsp;&emsp;没事少看点国内自媒体，凡是唱主旋律的下面评论区官方都帮你关了，评论也替我们筛选好了，这都没点数吗，你能看到的，从来都是别人想要你看到的。</p><p>&emsp;&emsp;想要在这个社会上有立足之地，实力与能力在未来将成为决定性因素。<br>&emsp;&emsp;加油吧大伙，别把挫折看的那么重，整点真本事出来，少往心里放点事，乐观面对每一天，比啥都强。<br>&emsp;&emsp;以上内容仅取自我的个人视角，有问题不去正视才是最蠢的，听之任之，是对历史与文明的不敬，更对不起世世代代的努力<br>&emsp;&emsp;祝伟大的祖国繁荣昌盛</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 社会现象分析 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 就业难 扩招 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>房地产经济为何主导了经济的发展</title>
       <link href="/%E5%9C%9F%E5%9C%B0%E9%87%91%E8%9E%8D/"/>
       <url>/%E5%9C%9F%E5%9C%B0%E9%87%91%E8%9E%8D/</url>
@@ -246,6 +221,31 @@
         <tags>
             
             <tag> 分税制，土地政策，土地金融 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>为什么毕业生越来越难了?</title>
+      <link href="/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/"/>
+      <url>/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;如果年度词汇可以选负面词汇的话，我相信，这个字只会取自两个方面：<br>1：疫情下经济低迷与人的精神问题<br>2：卷（多多少少带有本人的个人恩怨，但不影响与第一个方面并列）</p><p>&emsp;&emsp;我们为什么越来越难找工作了呢？为什么考研考公还在水涨船高？这种病态的考试应试系统为全社会都看在眼里却默不作声？</p><p>第一个问题：首先工作为什么越来越难找？<br>&emsp;&emsp;我感觉随便找个大学生出来他都能答出来：疫情之下经济低迷，各行各业（餐饮、零售、交通、旅游、等等等等）受到牵连，社会流动资金缩水，岗位缩招。拿互联网公司来举例，大公司因为资金短缺问题都能把整个研发部门给裁掉，没有经济来促进行业发展，招聘的毕业生自然而然就少了。<br>总之蛋糕变小了，能养的起的人数也减少了。</p><p>第二个问题:为什么考研考公水涨船高？<br>&emsp;&emsp;在回答这个问题的同时，先回想一下你的父母是不是曾经说过当年考上大学是多么多么困难，考上了就会分配工作以后生活无忧等等。<br>第一个关键点出现了，我们感觉现在好像考个大学有手就行，但当时非也，这种现象和当时的社会经济与教育资源有关，南方我不知道，北方大部分父母在小学初中毕业以后就会辍学种地，去城市打工减少家里的压力，一家好多个孩子也就会有一个或两个去读高中。好，现在都还很容易理解，那么列出1995年和2022年的高等教育适龄入学率（即同龄人中，上大学人数比总同龄人数）：<br>1995年：5.3%<br>2020年：54%<br>对比周边国家：<br><img src="/img/2.png" alt=""><br>&emsp;&emsp;从上面的数据不难看出，从前的大学教育是精英式教育，现在的大学教育是大众式教育。<br>&emsp;&emsp;那么什么时候开始有计划性的扩招了呢？<br>&emsp;&emsp;一切社会问题的产生永远都避不开一个要素：经济。毕竟整个地球史上就没有生物会和钱过不去的。<br>&emsp;&emsp;首先阐述一个事实，教育和经济是双向互补的。<br>&emsp;&emsp;去问问你的父母，1999年很重大的一件事，下岗潮。那一年国内市场经济下行，当年产生了1000万的下岗工人（没上大学的还是有充足的岗位去处的），年轻人不进大学，就会和全体工人一起竞争，在市场有限的条件下，社会矛盾会激化，因此就决定让更多学生进入大学。大学生进入大学，除了缓解当年的就业，下岗在就业的压力，还可以带动经济的发展，因为父母在看到扩招之前的大学生是如何风光，砸锅卖铁也都会供孩子上大学，这样本来停滞的经济也就开始流动起来，比如学生的住宿费，伙食费，可以促进学校引入师资和校舍和当地商业的发展，小学，初中，高中的大规模兴办，教师行业的兴起（你细品什么时候高中大学开始收学费的），学生的出行可以给铁路的建设提供资金支持，铁路建成则促进了各地经济的快速发展，因此这是当时市场经济的一剂强心针。<br>&emsp;&emsp;于是乎在1998年15大上就决定大学扩招，决定在2010年将上面的高等教育适龄入学率扩大到15%。于是1999年就是“大学扩招”年。但令人啧啧称奇的是这个计划在2003年就达到了15%，整整提前了7年。<br>我们可以看出，当年的大学扩招成效：<br>1、成功缓解了下岗潮的压力<br>2、成功促进了经济的发展，在2002年就达到了本来计划在2010年的15%大学入学率，足以证明这项举措是多么有成效。</p><p>&emsp;&emsp;好，再转向今年的考研考公，如果你观察数据可以发现，考研人数暴涨：<br><img src="/img/3.jpg" alt=""><br>&emsp;&emsp;2021年450w，2022年540w，足见经济形势的困顿，暴涨的背后伴随着教育部对研究生进行了扩招，同样的经济困顿，同样的扩招，此时此刻恰如彼时彼刻。<br>那如何处理当今的问题呢？<br>&emsp;&emsp;答：—“抄作业”—</p><p>&emsp;&emsp;打算直接复刻1999荣光是吧。当年的缓兵之计卓见成效，但如今的缓兵之计则不太行。区别在于：<br>1、缓兵的这几年经济并没有增长，就业岗位不增反减。经济没有增长的原因是疫情下的政策束手束脚，经济必然后退；还有就是Trump的贸易战，（有人说Trump贸易战输了我就想笑，贸易战确实是伤敌1000自损800，但问题是1000对人家来说不痛不痒，800对我们来说如数家珍），我国经济分为国内市场经济和海外进出口经济，国内市场经济被疫情拖累，海外进出口经济则被Trump咬住。这两方面导致了经济没有活力，导致经济下行<br>2、当1999就算扩招了，但绝大多数人还是上不了大学，和绝大部分适龄青年依旧是毫无关系，构不成激烈的竞争。现如今是却一个几乎全民大学的时代，扩招则就象征着内卷走向合理化与强制化，并且“读书改变命运”，“努力就会有回报”，儒家文化等信条深入人心，大家都想往上面发展，助长了内卷。但如今经济和岗位并没有增加，反倒是硕士研究生爆表，本科生无处可去。社会上的饭碗依旧是那么几个，反而就业，待就业人数两年内凭空增加了800w，再加上下一年的1000w毕业生，将近2000w。而且还呈现逐年积累的趋势，该如何解决？无法解决，但不管所有人愿不愿意，这2000w迟早会被消化掉，怎么消化掉？不知道，反正能消化掉就是了。</p><p>&emsp;&emsp;因此，这次的“抄作业”显然大局已定。除此之外，这种政策也导致了就业人员，准就业人员，预就业人员（我自己），产生了眼高手低的通病。<br>&emsp;&emsp;为什么感觉毕业待遇一年不如一年？很简单，人多了，均摊就少了。“之前的毕业生能拿到那么多工资，那我也应该拿那么多。”虽然我也很想对别人这么说，我自己也会这样去想，但事实是，就是我们眼高手低，自己不配。我们毕业证书的含金量，在前人看来大学很不错，就是天之骄子，这也是为什么我们会从长辈那里得到赞誉的原因，但实际上是，我们这个时代毕业人数比他们那个时候增加了10倍，但社会的饭碗只增加了三倍，本科毕业，硕士毕业的含金量就被稀释掉了。整个社会上的硕士博士数量逐年增加，硕士博士学历的含金量也必然逐年被稀释，上面有政策有要求各单位扩招保障毕业生就业率，但企业准入门槛还是硕士没有变，怎么办？把硕士工资稀释掉呗，因此现在硕士的底薪在逐年减少，这样才能多养几个员工。<br>&emsp;&emsp;自己的底薪被稀释，对于近几年在默默努力，疯狂内卷的社会成员来说，大部分人们的努力，是绝对得不到他们预想中的回报的。劳资努力了好几年，不拿高薪，对得起自己这几年的努力吗？很遗憾，我们的努力，是时势所趋，并非时势所需。我们所学的高考知识，本科知识，考研考公的内容，可以说和今后的工作内容完美脱轨。企业给高薪资，涨薪资的条件是你有“工作”能力，而不是应试能力，因此内卷了却没有得到回报的人大有人在，郁郁寡欢的人大有人在，社会矛盾只会积重难返。但是不内卷躺平吗？只会更惨。</p><p>&emsp;&emsp;最后我们再来分析一下人口结构：<br>&emsp;&emsp;2002年15%的大学入学率，剩下的85%在干什么？<br>&emsp;&emsp;2020年55%的大学入学率，剩下的45%在干什么？<br>&emsp;&emsp;2002年产业结构主打的是轻工业，重工业与农业，2020年也还是轻工业，重工业与农业，产业结构没转型吗？转了，但不太多。那以前初高中毕业进厂干的活现在谁干了？答：本科生。以前本科生干的活现在谁干了？答：985，211毕业生。我们的学历都在提升，但所干的工作内容，可以说没有变化。相比2002，他们起码还有一技之长，虽然学历不高，但人家的技能是真能养活自己，而我们，什么都会，又什么都不会，大学打着培养融会贯通的高等人才的旗号，让我们去学遍自然科学，从这一刻开始，我们就开始了眼高手低的第一步，谁是融会贯通的高等人才？我融会贯通干什么？反正我肯定不是，我感觉和自然科学有关的课对我来说屁用没有。因此我的评价是：无用功盛行，浪费年轻人的生命，政策已经弊大于利了。到最后我们走进社会干的和先人干的没啥区别（因为向高新科技，制造业的产业转型太慢了），我们花了更长的时间在学海里兜兜转转还是回到了前人的起点，那我们做出的努力和耗费的生命还有什么意义？但我们的国度并不缺聪明人，可能我们人人都比马克思聪明，但让聪明人变傻是很简单的，我是不信马克思在经历了高考大学以后还能写出资本论，因为他得在大学毕业才步入社会，才有时间去思考。</p><p>&emsp;&emsp;由于我们的长辈基本没学历或者是普通本科，我们看到他们现在也还活得不错，小康水平，导致我们会产生本科毕业起码在十八线县城也能活得不错吧，我学历比我爸妈高，他们在十八线小县城，那我们应该可以在四线，五线城市过一个简朴富足的生活了吧！这就错了呀，大错特错，我们学历是高了，大家学历都高了，按宏观数据来说，现在的普通本科甚至远远对标不上当时的大专，放在2002年我们也还是进不去大学的那一批，随着大学扩招，本科扩招，研究生扩招，我们只不过空有知识，空有学历，但社会上的碗筷并没有多出多少。因此，我们学识远超我们的父母，我们的学历远超我们的父母，但我们能够得到的生活质量，可能还远远不如。<br>&emsp;&emsp;别嘲笑我们的老爸老妈没文化，放到1995年，我们也那样。</p><p>&emsp;&emsp;之后的几年还会时艰难的几年，Trump大选成功，贸易战经济战也在加速，甚至USA在重返月球，新一轮太空竞赛很难不开启。同时后疫情时代人们的精神状态，南北贫富差距进一步增大，低迷的生育率（东北三省生育率碾压韩国喜提世界倒数第一，黑龙江更是站在了世界之巅）。房地产的经济泡沫什么时候会爆，这些都没有定数。但和之前几年的飞速发展相比，之后的几年甚至十年应该会是最严峻的十年了。</p><p>&emsp;&emsp;这样第二个问题就解决完了。</p><p>&emsp;&emsp;至于第三个问题，算了，不利于团结的话不说了。<br>&emsp;&emsp;没事少看点国内自媒体，凡是唱主旋律的下面评论区官方都帮你关了，评论也替我们筛选好了，这都没点数吗，你能看到的，从来都是别人想要你看到的。</p><p>&emsp;&emsp;想要在这个社会上有立足之地，实力与能力在未来将成为决定性因素。<br>&emsp;&emsp;加油吧大伙，别把挫折看的那么重，整点真本事出来，少往心里放点事，乐观面对每一天，比啥都强。<br>&emsp;&emsp;以上内容仅取自我的个人视角，有问题不去正视才是最蠢的，听之任之，是对历史与文明的不敬，更对不起世世代代的努力<br>&emsp;&emsp;祝伟大的祖国繁荣昌盛</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 社会现象分析 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 就业难 扩招 </tag>
             
         </tags>
       
@@ -304,30 +304,11 @@
     
     
     <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/QTwidget/"/>
-      <url>/QTwidget/</url>
-      
-        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>C++笔记</title>
       <link href="/C-%E8%B8%A9%E5%9D%91/"/>
       <url>/C-%E8%B8%A9%E5%9D%91/</url>
       
-        <content type="html"><![CDATA[<!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于常量指针与指针常量</p><p>const int <em>p=&amp;a ; const 修饰的是取 </em>的操作，因此取星操作不能改变，就是 *p的值(p所指的内容)不可改变 ，但指针的方向可以改变。<br><img src="/img/5.png" alt="">  </p><p>int * const p = &amp;a ; const修饰的是p这个指针，因此这个指针的指向固定了，但是指针所指的内容可以改变。<br><img src="/img/4.png" alt=""><br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于栈空间返回值用指针与别名接收</p><p>int test01()<br>{<br>    int a=10;<br>    return a;<br>}</p><p>int main()<br>{<br>    int &amp;ref = test01();<br>    cout&lt;&lt;”ref = “&lt;&lt; ref &lt;&lt; endl;<br>    cout&lt;&lt;”ref = “&lt;&lt; ref &lt;&lt; endl;<br>}</p><p>输出结果： ref = 10<br>          ref = 2425255</p><p>原因，拿别名指向返回值，但test01()执行完后，该返回值所在空间被释放了，编译器会默认保留返回值一次。<br>同理：<br>int test01()<br>{<br>    int a=10;<br>    return &amp;a ;<br>}</p><p>int main()<br>{<br>    int <em>ref = test01();<br>    cout&lt;&lt;”ref = “&lt;&lt; </em>ref &lt;&lt; endl;<br>    cout&lt;&lt;”ref = “&lt;&lt; *ref &lt;&lt; endl;<br>}<br>输出结果： ref = 10<br>          ref = 2425255<br>也是一个原因。其本质都是指针指向了一个被释放的栈空间而编译器只保留了一次。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline -->]]></content>
+        <content type="html"><![CDATA[<!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于常量指针与指针常量</p><pre><code>const int *p=&amp;a ; </code></pre><p>const 修饰的是取 <em>的操作，因此取星操作不能改变，就是 </em>p的值(p所指的内容)不可改变 ，但指针的方向可以改变。<br><img src="/img/5.png" alt="">  </p><pre><code>int * const p = &amp;a ; </code></pre><p>const修饰的是p这个指针，因此这个指针的指向固定了，但是指针所指的内容可以改变。<br><img src="/img/4.png" alt=""><br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于栈空间返回值用指针与别名接收</p><pre><code>int test01()&#123;    int a=10;    return a;&#125;int main()&#123;    int &amp;ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255</p><p>原因，拿别名指向返回值，但test01()执行完后，该返回值所在空间被释放了，编译器会默认保留返回值一次。<br>同理：<br>    int test01()<br>    {<br>        int a=10;<br>        return &amp;a ;<br>    }</p><pre><code>int main()&#123;    int *ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255<br>也是一个原因。其本质都是指针指向了一个被释放的栈空间而编译器只保留了一次。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline -->]]></content>
       
       
       <categories>
@@ -342,6 +323,25 @@
             <tag> 指针，踩坑 </tag>
             
         </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/QTwidget/"/>
+      <url>/QTwidget/</url>
+      
+        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
       
     </entry>
     
@@ -373,31 +373,6 @@
     
     
     <entry>
-      <title>操作系统的发展简史</title>
-      <link href="/x86/"/>
-      <url>/x86/</url>
-      
-        <content type="html"><![CDATA[<p>今天我们来聊一聊系统名词：<br>&emsp;&emsp;x86:x86是一种CPU指令集的架构，每个指令是32位，最先由Intel公司研发，x86_64表示同样基于x86指令集，但每个指令增加到64位，最先由AMD公司研发，我们电脑目前都是64位，也就是x86_64。同时64位可以兼容32位，有的软件比较古老，能在32位计算机上运行，那现在的64位电脑就可以运行。但64位的软件就不能在32位机上运行，因为位数不够。<br>&emsp;&emsp;Arm用的是32位精简指令集（x86是复杂指令集，都是同一个时期的东西），性能不行但优点是用Arm架构的产品耗能低，因此在嵌入式系统上如手机，大放异彩。手机不需要那么高的性能，但要求待机时间长，而计算机则相反，x86也就独霸了计算机领域。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 计网与操作系统 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> x86 x86_64 Arm  Intel AMD </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>测试文章</title>
       <link href="/test/"/>
       <url>/test/</url>
@@ -415,6 +390,31 @@
         <tags>
             
             <tag> 个人 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>操作系统的发展简史</title>
+      <link href="/x86/"/>
+      <url>/x86/</url>
+      
+        <content type="html"><![CDATA[<p>今天我们来聊一聊系统名词：<br>&emsp;&emsp;x86:x86是一种CPU指令集的架构，每个指令是32位，最先由Intel公司研发，x86_64表示同样基于x86指令集，但每个指令增加到64位，最先由AMD公司研发，我们电脑目前都是64位，也就是x86_64。同时64位可以兼容32位，有的软件比较古老，能在32位计算机上运行，那现在的64位电脑就可以运行。但64位的软件就不能在32位机上运行，因为位数不够。<br>&emsp;&emsp;Arm用的是32位精简指令集（x86是复杂指令集，都是同一个时期的东西），性能不行但优点是用Arm架构的产品耗能低，因此在嵌入式系统上如手机，大放异彩。手机不需要那么高的性能，但要求待机时间长，而计算机则相反，x86也就独霸了计算机领域。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计网与操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> x86 x86_64 Arm  Intel AMD </tag>
             
         </tags>
       
