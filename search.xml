@@ -279,6 +279,25 @@
     
     
     <entry>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/2022-11-22/"/>
+      <url>/2022-11-22/</url>
+      
+        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>强化学习资源</title>
       <link href="/2022-11-24/"/>
       <url>/2022-11-24/</url>
@@ -298,25 +317,6 @@
             <tag> 强化学习 </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/2022-11-22/"/>
-      <url>/2022-11-22/</url>
-      
-        <content type="html"><![CDATA[<p>如何理解下面段代码?<br>1 Widget::Widget(QWidget *parent) :<br>2    QWidget(parent)<br>3 {<br>4 }</p><p>在讲解原因之前，先请大家看下面的一个例子:</p><h1 id="include"><a href="#include" class="headerlink" title="include "></a>include <iostream></h1><p>using namespace std;<br>class Base<br>{<br>public:<br>    Base() :m_num(0){<br>        cout &lt;&lt; “this is Base()” &lt;&lt; endl;<br>    }<br>    Base(int val):m_num(val){<br>        cout &lt;&lt; “this is Base(int val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><p> class BaseChild: public Base<br>{<br>public:<br>    BaseChild(){<br>        cout &lt;&lt; “this is BaseChild()” &lt;&lt; endl;<br>    }<br>    BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>private:<br>    int m_num;<br>};<br>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><p>int main(int argc, char *argv[])<br>{<br>    BaseChild child1;<br>    BaseChild child2(5);</p><pre><code>return 0;</code></pre><p>}<br>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:<br>BaseChild(int val): Base(val){<br>        cout &lt;&lt; “this is BaseChild(val)” &lt;&lt; endl;<br>    }<br>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：<br>QWidget::QWidget( QWidget <em>parent, const char </em>name, WFlags f )<br>    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),<br>      pal( parent ? parent-&gt;palette()        // use parent’s palette<br>           : <em>qApp-&gt;palette() )            // use application palette<br>{<br>    if ( parent ) {<br>    QChildEvent </em>e = new QChildEvent( Event_ChildInserted, this );<br>    QApplication::postEvent( parent, e );<br>    }<br>}<br>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
       
     </entry>
     
@@ -365,6 +365,31 @@
         <tags>
             
             <tag> x86 x86_64 Arm  Intel AMD </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>QT如何连接mysql</title>
+      <link href="/database/"/>
+      <url>/database/</url>
+      
+        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 指针，踩坑 </tag>
             
         </tags>
       
