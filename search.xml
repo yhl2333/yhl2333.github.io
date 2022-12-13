@@ -33,7 +33,7 @@
       <link href="/Tcp/"/>
       <url>/Tcp/</url>
       
-        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字，指出服务器端套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;如果服务器端接收到了，之后客户端的套接字会收到服务器的套接字的已连接信息(也是系统自己操做的)，并发出connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能接收，不能发送，这就意味着服务器不能回话！怎么办呢？再在服务器端创造一个套接字，但再创造一个套接字的话就意味着上面的所有步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，它知道通道另一端的客户端套接字的IP与端口，可以直接回复信息（客户端的tcpSocket给服务端的tcpServer发信息，服务器端的tcpSocket给客户端的tcpSocket回话，实现双向通信，相当于客户端给服务器打电话，客户端这边一个人又能听又能说tcpSocket，服务器这边站着俩人，一个哑巴tcpServer，一个聋子tcpSocket，但俩人合体一切正常）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;之后服务器的套接字会向客户端套接字发送已连接信息(也是系统自己操做的，实际是tcpServer生成的tcpSocket发送)，客户端收到该信息后会产生一个connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看ip与端口的代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能监听端口，这就意味着服务器不能收发消息！怎么办呢？再在服务器端创造一个tcpSocket套接字呗。但再创造一个套接字的话就意味着上面的所有和客户端套接字的连接步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();就是在tcpServer的基础上生成一个tcpSocket。<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，由于它是在tcpServer的基础上生成一个tcpSocket，它知道通道另一端的客户端套接字的IP与端口，因此可以直接回复信息（客户端的tcpSocket连接服务器的tcpServer，服务器端的TcpServer套接字生成了一个子套接字tcpSocket，由这个子套接字tcpSocket和客户端进行收发消息通信）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字<br>我们需要明确的是：1、接受信息的一方不需要发送者的IP与port,发送信息的一方必须要知道对方的IP与port。<br>                2、tcpServer只有监听功能，服务器的收发信息功能是由它生成的tcpSocket负责的。</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
@@ -229,31 +229,6 @@
     
     
     <entry>
-      <title>第一性原则</title>
-      <link href="/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/"/>
-      <url>/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;拥有特斯拉，SpaceX，Twiter的马斯克所说的第一性原则是个啥？跟他的成功有关系吗？</p><p>&emsp;&emsp;第一性原理指的是，回归事物最基本的条件，将其拆分成各要素进行解构分析，从而找到实现目标最优路径的方法。该原理源于古希腊哲学家亚里士多德提出的一个哲学观点：“每个系统中存在一个最基本的命题，它不能被违背或删除。”</p><p>&emsp;&emsp;这段话翻译成人话的意思是：想建金字塔，就把金字塔分为n层建造，由地基往上一层一层建。最底层放的就是最牢固的，绝对不会出错的东西，因为根基不稳金字塔早晚得倒，然后依次向上，错了就把这层推倒，重新建。<br>&emsp;&emsp;就比如解数学题，你先将问题分解，反复质疑假设，分析出要用到哪个章节的数学公理，这些数学公理就是金字塔的最底层，这些东西是绝对不会出错。以此为基础向上搭建金字塔，就相当于在公理的基础上将题目给的条件恒等变形得到对你有利的结论，这一步可能你得到的是错的结论，但是你的底子是正确的，因此你不断尝试就就极有可能正确。<br>&emsp;&emsp;对马斯克来说，在其他航天制造商购买火箭成品要花6500W$,他就思考这这么贵的本质，也就是成本到底有多少，发现航天飞机本身的建材费用只占报价2%，于是他放弃购买成品转而建立了SpaceX。</p><p>&emsp;&emsp;总结：第一性原理最基本的就是思考一个事物或问题的根本真理是什么，就像在最基础的水平上，构成一个学科最简单也是大家都承认的公理是什么，然后在这些真理上往上搭建，有条理，辩证的去思考，去接近事物的本质。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 社会现象分析 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 第一性原则 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>为什么毕业生越来越难了?</title>
       <link href="/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/"/>
       <url>/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/</url>
@@ -271,6 +246,31 @@
         <tags>
             
             <tag> 就业难 扩招 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>第一性原则</title>
+      <link href="/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/"/>
+      <url>/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;拥有特斯拉，SpaceX，Twiter的马斯克所说的第一性原则是个啥？跟他的成功有关系吗？</p><p>&emsp;&emsp;第一性原理指的是，回归事物最基本的条件，将其拆分成各要素进行解构分析，从而找到实现目标最优路径的方法。该原理源于古希腊哲学家亚里士多德提出的一个哲学观点：“每个系统中存在一个最基本的命题，它不能被违背或删除。”</p><p>&emsp;&emsp;这段话翻译成人话的意思是：想建金字塔，就把金字塔分为n层建造，由地基往上一层一层建。最底层放的就是最牢固的，绝对不会出错的东西，因为根基不稳金字塔早晚得倒，然后依次向上，错了就把这层推倒，重新建。<br>&emsp;&emsp;就比如解数学题，你先将问题分解，反复质疑假设，分析出要用到哪个章节的数学公理，这些数学公理就是金字塔的最底层，这些东西是绝对不会出错。以此为基础向上搭建金字塔，就相当于在公理的基础上将题目给的条件恒等变形得到对你有利的结论，这一步可能你得到的是错的结论，但是你的底子是正确的，因此你不断尝试就就极有可能正确。<br>&emsp;&emsp;对马斯克来说，在其他航天制造商购买火箭成品要花6500W$,他就思考这这么贵的本质，也就是成本到底有多少，发现航天飞机本身的建材费用只占报价2%，于是他放弃购买成品转而建立了SpaceX。</p><p>&emsp;&emsp;总结：第一性原理最基本的就是思考一个事物或问题的根本真理是什么，就像在最基础的水平上，构成一个学科最简单也是大家都承认的公理是什么，然后在这些真理上往上搭建，有条理，辩证的去思考，去接近事物的本质。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 社会现象分析 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 第一性原则 </tag>
             
         </tags>
       
@@ -423,31 +423,6 @@
     
     
     <entry>
-      <title>C++笔记</title>
-      <link href="/python/"/>
-      <url>/python/</url>
-      
-        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br>    def get_return()<br>        b=1<br>        c=2<br>        d=3<br>        return b,c,d</p><pre><code>get_b,get_c,get_d = get_return()</code></pre><!-- endtimeline --><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 软硬件 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> python技巧 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>强化学习资源</title>
       <link href="/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/"/>
       <url>/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/</url>
@@ -465,6 +440,31 @@
         <tags>
             
             <tag> 强化学习 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>C++笔记</title>
+      <link href="/python/"/>
+      <url>/python/</url>
+      
+        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br>    def get_return()<br>        b=1<br>        c=2<br>        d=3<br>        return b,c,d</p><pre><code>get_b,get_c,get_d = get_return()</code></pre><!-- endtimeline --><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 软硬件 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> python技巧 </tag>
             
         </tags>
       
