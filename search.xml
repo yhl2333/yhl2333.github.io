@@ -329,11 +329,11 @@
     
     
     <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/QTwidget/"/>
-      <url>/QTwidget/</url>
+      <title>C++线程</title>
+      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
+      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
       
-        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+        <content type="html"><![CDATA[<p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();</p><p>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();</p><p>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
@@ -342,6 +342,12 @@
           
       </categories>
       
+      
+        <tags>
+            
+            <tag> 线程 </tag>
+            
+        </tags>
       
     </entry>
     
@@ -365,6 +371,50 @@
         <tags>
             
             <tag> 指针，踩坑 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/QTwidget/"/>
+      <url>/QTwidget/</url>
+      
+        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>C++笔记</title>
+      <link href="/python/"/>
+      <url>/python/</url>
+      
+        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br>    def get_return()<br>        b=1<br>        c=2<br>        d=3<br>        return b,c,d</p><pre><code>get_b,get_c,get_d = get_return()</code></pre><!-- endtimeline --><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 软硬件 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> python技巧 </tag>
             
         </tags>
       
@@ -440,31 +490,6 @@
         <tags>
             
             <tag> 强化学习 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>C++笔记</title>
-      <link href="/python/"/>
-      <url>/python/</url>
-      
-        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br>    def get_return()<br>        b=1<br>        c=2<br>        d=3<br>        return b,c,d</p><pre><code>get_b,get_c,get_d = get_return()</code></pre><!-- endtimeline --><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 软硬件 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> python技巧 </tag>
             
         </tags>
       
