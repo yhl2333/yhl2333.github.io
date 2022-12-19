@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>关于C++ QT中的Tcp</title>
+      <link href="/Tcp/"/>
+      <url>/Tcp/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;之后服务器的套接字会向客户端套接字发送已连接信息(也是系统自己操做的，实际是tcpServer生成的tcpSocket发送)，客户端收到该信息后会产生一个connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看ip与端口的代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能监听端口，这就意味着服务器不能收发消息！怎么办呢？再在服务器端创造一个tcpSocket套接字呗。但再创造一个套接字的话就意味着上面的所有和客户端套接字的连接步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();就是在tcpServer的基础上生成一个tcpSocket。<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，由于它是在tcpServer的基础上生成一个tcpSocket，它知道通道另一端的客户端套接字的IP与端口，因此可以直接回复信息（客户端的tcpSocket连接服务器的tcpServer，服务器端的TcpServer套接字生成了一个子套接字tcpSocket，由这个子套接字tcpSocket和客户端进行收发消息通信）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字<br>我们需要明确的是：1、接受信息的一方不需要发送者的IP与port,发送信息的一方必须要知道对方的IP与port。<br>                2、tcpServer只有监听功能，服务器的收发信息功能是由它生成的tcpSocket负责的。</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Tcp </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>TCP的三次握手</title>
       <link href="/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"/>
       <url>/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/</url>
@@ -46,31 +71,6 @@
         <tags>
             
             <tag> UDP TCP </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于C++ QT中的Tcp</title>
-      <link href="/Tcp/"/>
-      <url>/Tcp/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;之后服务器的套接字会向客户端套接字发送已连接信息(也是系统自己操做的，实际是tcpServer生成的tcpSocket发送)，客户端收到该信息后会产生一个connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看ip与端口的代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能监听端口，这就意味着服务器不能收发消息！怎么办呢？再在服务器端创造一个tcpSocket套接字呗。但再创造一个套接字的话就意味着上面的所有和客户端套接字的连接步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();就是在tcpServer的基础上生成一个tcpSocket。<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，由于它是在tcpServer的基础上生成一个tcpSocket，它知道通道另一端的客户端套接字的IP与端口，因此可以直接回复信息（客户端的tcpSocket连接服务器的tcpServer，服务器端的TcpServer套接字生成了一个子套接字tcpSocket，由这个子套接字tcpSocket和客户端进行收发消息通信）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字<br>我们需要明确的是：1、接受信息的一方不需要发送者的IP与port,发送信息的一方必须要知道对方的IP与port。<br>                2、tcpServer只有监听功能，服务器的收发信息功能是由它生成的tcpSocket负责的。</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Tcp </tag>
             
         </tags>
       
@@ -304,6 +304,31 @@
     
     
     <entry>
+      <title>C++线程</title>
+      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
+      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();<br><img src="/img/thread1.png" alt=""><br>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();<br><img src="/img/thread2.png" alt=""><br>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 线程 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C++笔记</title>
       <link href="/C-%E8%B8%A9%E5%9D%91/"/>
       <url>/C-%E8%B8%A9%E5%9D%91/</url>
@@ -329,23 +354,23 @@
     
     
     <entry>
-      <title>C++线程</title>
-      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
-      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
+      <title>强化学习资源</title>
+      <link href="/DQN/"/>
+      <url>/DQN/</url>
       
-        <content type="html"><![CDATA[<p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();<br><img src="/img/thread1.png" alt=""><br>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();<br><img src="/img/thread2.png" alt=""><br>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+        <content type="html"><![CDATA[<p>什么是DQN(Deep-Q-Learning)？<br>答：用神经网络近似最优动作价值函数Q*。</p><p>Q<em>(st,at)函数作用：告诉智能体agent本次动作开始到任务结束平均收益最大的动作是哪个，但平均收益并不意味着一定收益最大（选择动作后环境的随机性？）<br>a</em>:平均收益最高的动作a<em>=argmaxQ</em>(s,a)。</p><p>&emsp;&emsp;价值学习<br>价值学习想做的就是想挑选出价值最高的行动方案来让agent完成任务，那如何让价值最高呢？我们来观察价值函数：Qpai=(st,at)，显然这个价值函数中包含了决策函数pai，决策函数pai影响了Qpai的最终取值结果，因此Qpai函数肯定可以通过调节决策pai得到最高价值函数，我们记为Q<em>。我们反复训练数据，只要可以让Qpai的值逼近Q</em> 的值就可以了，因为 Q<em>(st,at) 意味着在st状态下，进行at动作，会使得本次加以后的平均收益最大。可是要通过寻找合适的pai函数的话过于麻烦了，那么如何绕开pai函数呢，这里就用到了神经网络方法，也就是DQN(Deep-Q-Learning)。用Q=(st,at,w)来构建神经网络，通过迭代更改w,就可以改变优化Q最终的取值。因此我们只需要用合适的标签值不断迭代就可以找到一组合适的参数w,使得计算得到的Q值达到最佳pai函数可以达到的Q</em>。<br><img src="/img/valuepolicy1.png" alt="DQN神经网络"><br>&emsp;&emsp;TD算法与神经网络的输入输出：<br>Ut=Rt+r<em>(Rt+1 + r</em>(Rt+2) +r^2<em>(Rt+3)+···)。即Ut=Rt+ r </em> Ut+1<br>&emsp;&emsp;因为Q是U的期望值，所以这里我们可以用Q(St,At,w)代替Ut,用Q（St+1,At+1,w）来代替Ut+1，以上式子成立，但由于要求具体的St：st；At：at的Q(st,at)值，等号左边的Q(St,At,w)要变为Q(st,at)，这时等号右边无法与左边相等了，那么右边就得找东西来近似约等于左边，于是Q-Learning就将Rt确定为rt,这样st+1也确定下来了，这样Q（St+1,At+1,w）就由 Q(st+1，at+1，w)代替，等式变为约等号（st+1和rt都由环境给出）。这就是TD算法的应用！注意：这里面的Q都是数值，不是向量，因为其定义是at为任意动作时收益的期望值。<br><img src="/img/12-18-3.png" alt="近似原理"><br>&emsp;&emsp;那么迭代的标签值去哪里找呢？首先我们要知道神经网络输入时场景状态图片st,输出值是通过网络得到的Qt(st,at,w)···标签值我们就用上面的Q(st,at,w)，即rt+ r <em> Q(st+1，at+1，w)，其中at+1取st+1状态在DQN网络中打分最高的动作a，（别问为什么不能Q（st+1,At+1,w）进行蒙特卡洛近似，因为QLearning算法要求这么干取到最大的Q值，P8视频4:08）st状态下有几个动作输出就有几个标签值，标签值之间的不同是根据rt，t取上下左右来实现差异的！DQN网络输出的at可取上下左右等动作，依然有几个动作就有几个输出，参照上面神经网络输出的图片，两者相减，差值就可以实现后续的梯度操作了。TD算法的实质是知道了一个状态到下一个状态的准确增益rt(这之后状态的收益还是未知R)，这样TD方法得出的Q相比原来什么也不知道瞎预测的Q更加准确，就把该值当作标签值！你可能会说就知道了其中一步的准确奖励，还有n-1步的奖励还不知道呢！我就问你比不比原来准吧？因此就用这个不太靠谱的值和原来瞎蒙的Q的差值进行迭代系数来使得以后计算的Q值更加准确。经过反复迭后，计算得到的Q(st,at,w)就可以接近于理想的Q</em>函数。<br><img src="/img/valuepolicy.png" alt="迭代过程"> </p><p>&emsp;&emsp;策略学习包含蒙特卡洛近似<br>上面的方法我们通过对Q取最大值来找到agent的最佳方案，这次我们通过行动对决策函数pai入手，让pai只选择迭代后概率值最大的行动方式（价值决策可能会因为下一步的潜在价值而不一定选择当前概率值最高的行动方案，这也是基于价值与基于决策的本质区别）。<br>&emsp;&emsp;这时候用到的是Vpai，Vpai越大说明pai函数越好。同理，我们用V(s;Θ)通过调节神经网络参数Θ来逼近V的最大值，由于Vpai仅有策略函数pai决定，因此调节Θ来逼近V的极限值就相当于调整了pai函数，这是策略学习的最终目的。<br><img src="/img/actorpolicy.png" alt=""><br>&emsp;&emsp;需要注意的是，上图中的计算qt是用reinforce方法计算的，就是让agent使用最开始瞎蒙的决策函数玩一遍游戏，记录下所有的st,at,rt,观测到所有的rt,才可以计算出qt，原理如下图。因此Policy Gradiant是一种回合更新，TD是每一步都会更新学习。<br><img src="/img/actorpolicy1.png" alt=""><br>&emsp;&emsp;计算该qt的动作at则是通过蒙特卡洛近似—用当前的策略函数按概率抽一个动作，抽到谁at就是谁，这样简化了运算难度。</p><p>同时训练策略网络和价值网络：<br>从策略网络决策，价值网络打分。<br><img src="/img/12-19-2.png" alt=""><br>迭代来更新Θ与w。<br><img src="/img/12-19-1.png" alt=""></p>]]></content>
       
       
       <categories>
           
-          <category> C++ </category>
+          <category> 强化学习 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 线程 </tag>
+            <tag> 价值学习、策略学习 </tag>
             
         </tags>
       
@@ -398,6 +423,31 @@
     
     
     <entry>
+      <title>测试文章</title>
+      <link href="/test/"/>
+      <url>/test/</url>
+      
+        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 个人 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C++笔记</title>
       <link href="/python/"/>
       <url>/python/</url>
@@ -415,6 +465,31 @@
         <tags>
             
             <tag> python技巧 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>sara与Q-learning</title>
+      <link href="/sarsa%E4%B8%8EQ-learning/"/>
+      <url>/sarsa%E4%B8%8EQ-learning/</url>
+      
+        <content type="html"><![CDATA[<p>什么是蒙特卡洛近似？</p><p>&emsp;&emsp;比如有一个极其复杂的函数f(x)的定积分,复杂到手算根本解不了。你算不了计算机可以算啊！计算机怎么做？<br>很简单，计算机在你要积分的区间随机均匀抽样，将这些值取平均值再乘以区间长度就可以得到定积分值的大小，因此取得点越多，那么得到结果越准。<br>举个例子：求f(x)=x^(e^x<em>lnx)在区间[3,5]上的定积分。<br>蒙特卡洛会在[3,5]上随机均匀抽样抽10000甚至更多个点，这样（这些点对应的函数值加和/10000）</em>区间长度2=f(x)在[3,5]上的定积分值。</p><p>&emsp;&emsp;同理，如果f(x)函数在[3,5]上以一定的概率密度分布，蒙特卡洛法也可以轻松计算出f(x)在[3,5]上按概率密度分布的期望。计算方法和上面一样，唯一不同的地方就是均匀抽样要改成 “ 按照概率密度抽样！”，即概率密度大的地方肯定多抽几个点，概率密度小的地方少抽几个点。同样抽10000个点这样（这些点对应的函数值加和/10000）*区间长度2=f(x)在[3,5]上按一定概率密度分布的期望值。</p><p>计算TD-Target的sarsa算法与Q-learning算法：</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 强化学习 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> sara 与 Q-learning 蒙特卡洛近似 </tag>
             
         </tags>
       
@@ -448,36 +523,11 @@
     
     
     <entry>
-      <title>测试文章</title>
-      <link href="/test/"/>
-      <url>/test/</url>
+      <title>基本概念</title>
+      <link href="/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
+      <url>/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/</url>
       
-        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 个人 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>强化学习资源</title>
-      <link href="/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/"/>
-      <url>/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;大力推荐学习B站王树森的课：<br><a href="https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click</a></p><p>&emsp;&emsp;还有莫凡python的强化学习课，有代码，下载pycharm就能跟着跑代码，上面链接是理论课，下面链接时代码教程效果展示，自己跑一遍跟着理解：<br><a href="https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click</a></p><p>&emsp;&emsp;价值学习包含TD算法<br>价值学习想做的就是想挑选出价值最高的行动方案来让agent完成任务，那如何让价值最高呢？我们来观察价值函数：Qpai=(st,at)，显然这个价值函数中包含了决策函数pai，决策函数pai影响了Qpai的最终取值结果，因此Qpai函数肯定可以通过调节决策pai得到最高价值函数，我们记为Q<em>函数。agent通过Qpai=(st,at)值大小来选择最终行动方案，也就是说经过我们反复训练数据，只要可以找到Qpai的极限最大值，那么我们就得到了决策的绝对正确方案—让Q最大化，绝对可以使得agent训练后完美的完成任务。那么如何绕开pai函数呢，这里就用到了神经网络方法，也就是DQN(Deep-Q-Learning)。<br><img src="/img/valuepolicy1.png" alt=""><br>&emsp;&emsp;用Q=(st,at,w)来构建神经网络，通过迭代更改w,就可以改变优化Q最终的取值。因此我们只需要用合适的标签值不断迭代就可以找到一组合适的参数w,使得计算得到的Q值达到最佳pai函数可以达到的Q</em>。那么迭代的标签值去哪里找呢？就用TD算法，TD算法的实质是知道了一个状态到下一个状态的准确增益R(之后还是未知)，这样TD方法得出的Q相比原来什么也不知道瞎预测的Q更加准确，就把该值当作标签值！你可能会说就知道了其中一步的准确奖励，还有n-1步的奖励还不知道呢！我就问你比不比原来准吧？因此就用这个不太靠谱的值和原来瞎蒙的Q的差值进行迭代系数来使得以后计算的Q值更加准确。经过反复迭后，计算得到的Q(st,at,w)就可以接近于理想的Q*函数。<br><img src="/img/valuepolicy.png" alt=""><br>&emsp;&emsp;策略学习包含蒙特卡洛近似<br>上面的方法我们通过对Q取最大值来找到agent的最佳方案，这次我们通过行动对决策函数pai入手，让pai只选择迭代后概率值最大的行动方式（价值决策可能会因为下一步的潜在价值而不一定选择当前概率值最高的行动方案，这也是基于价值与基于决策的本质区别）。<br>&emsp;&emsp;这时候用到的是Vpai，Vpai越大说明pai函数越好。同理，我们用V(s;Θ)通过调节神经网络参数Θ来逼近V的最大值，由于Vpai仅有策略函数pai决定，因此调节Θ来逼近V的极限值就相当于调整了pai函数，这是策略学习的最终目的。<br><img src="/img/actorpolicy.png" alt=""><br><img src="/img/actorpolicy1.png" alt=""><br>&emsp;&emsp;需要注意的是，第三条中由于我们并不知道Qpai(价值学习知道Q不知道pai,策略学习知道pai不知道Q，这两种方法的实质就是用神经网络方法通过迭代调整参数来弥补并逼近不知道的部分的最优值)，因此上图中的计算qt是用reinforce方法计算的，就是让agent使用最开始瞎蒙的决策函数玩一遍游戏，记录下所有的st,at,rt,观测到所有的rt,才可以计算出qt，原理如下图。<br><img src="/img/actorpolicy1.png" alt=""><br>&emsp;&emsp;计算该qt的动作at则是通过蒙特卡洛近似—用当前的策略函数按概率抽一个动作，抽到谁at就是谁，这样简化了运算难度。</p>]]></content>
+        <content type="html"><![CDATA[<p>&emsp;&emsp;大力推荐学习B站王树森的课：<br><a href="https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV1Lg41117D3/?spm_id_from=333.337.search-card.all.click</a></p><p>&emsp;&emsp;还有莫凡python的强化学习课，有代码，下载pycharm就能跟着跑代码，上面链接是理论课，下面链接时代码教程效果展示，自己跑一遍跟着理解：<br><a href="https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click">https://www.bilibili.com/video/BV13W411Y75P/?spm_id_from=333.337.search-card.all.click</a></p><p>Rward:<br>强化学习的奖励Reward是自己确定的，rt相当于整个训练系统的监督信号，奖励确定的合不合理，就会影响学习的好不好！r和st,at,st+1有关：<br><img src="/img/12-18-1.png" alt=""> </p><p>动作函数(Policy)：<br><img src="/img/pai.png" alt=""> </p><p>价值函数(action-value-function)：<br>Rt是随着动作选择的不同依概率取不同值，将未来所有的Rt与衰减因子相乘叠加就是回报强化学习的收益Return（Ut）。对变量return(图中为Ut=Rt+···)求期望就是价值函数(Action-value-function)，其中pai是动作函数。<br><img src="/img/pai1.png" alt=""><br>直观意义：如果用Policy函数pai,在st状态下做动作at是好还是坏，Qpai就会给各种动作打分来判断是好还是坏。pai函数不一样，Qpai值也不一样。Rt+1，Rt+2等可以用pai函数积分掉。<br>最优动作价值函数：Q<em><br>Q</em> 与动作函数pai无关，因为 Q<em> 的定义是通过改变pai函数使得Q最大即Q</em>，因此Q*与pai函数无关。<br>直观意义：在最优pai条件下，Q就会给各种动作打分来判断是好还是坏。</p><p>状态价值函数(state-value-function)<br>把所有动作的积分掉，就可以判断当前所处的状态好不好。因此Vpai可以测试环境以及pai函数的好坏。<br><img src="/img/state-value-function.png" alt=""></p><p>随机性：<br>每次随机选定完acction，环境也是会随机抽样改变的。这就是state transition状态转移。<br>强化学习过程中的随机性：动作函数的随机性，状态转移函数的随机性。</p><p>因此诞生了两种强化学习的基础方式：Policy;Q*。<br>用这两种方式指导智能体行动。<br><img src="/img/12-18-2.png" alt=""> </p><p>Q(st,at,w)是一个数，表示在st,at条件下的期望价值<br>Q（St,At,w）是一个数，额外包含了st的多样性与at多样性的期望价值。<br>用蒙特卡洛近似的Q()举个例子：Q<em>(st,at)=E[Rt+r</em>maxQ*(St+1,a)],蒙特卡洛在该式子中的作用是随机抽样St+1，取均值。</p>]]></content>
       
       
       <categories>
@@ -486,12 +536,6 @@
           
       </categories>
       
-      
-        <tags>
-            
-            <tag> 价值学习、策略学习 </tag>
-            
-        </tags>
       
     </entry>
     
