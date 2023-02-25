@@ -179,6 +179,56 @@
     
     
     <entry>
+      <title>开发者日志</title>
+      <link href="/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/"/>
+      <url>/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/</url>
+      
+        <content type="html"><![CDATA[<div class="note default simple"><p>default 开发者日志</p></div><div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴样式</p></div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-21 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases">1.0</a></p></div></div><div class='timeline-item-content'><p>本博客网站开服，作者：yhl2333<br>学校：五道口信息技术学院<br>邮箱：1652966670@qq.com</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;好不容易把bug改完了，把功能实现了。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.6">1.0 -&gt; 1.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月23日，新增了留言新功能，希望大家可以对博客网站提出建设性意见或者有什么想留言的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-25 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月25日，本着精益求精的态度，我对博客进行的大幅度的美化与修缮，成功实现了白天黑夜不同的界面显示与特效。这个过程历时整整一天，出现的问题：修改博客文件后在本地 host:4000端口打开的效果和在浏览器中服务器IP地址打开的效果不同，不同之处在于修改的部分没有显示。进过多次调试查证发现是浏览器自己的数据缓存功能，慨叹自己如此伞兵的同时也对浏览器的搜索引擎的检索能力提出质疑。浏览器的数据缓存：浏览器在加载网页之后会将内容缓存到你的设备上，当你再次访问（包括刷新网页）这个网站就会优先显示上一次加载缓存过的结果，而不是默认立即从服务器上更新全部网站内容，不然1GB的流量打开几个图片量大的网页就都没了。这也就导致了网站的开发者修改过服务器上的资源后刷新网址网址会没有任何变化，望诸位前后端开发者引以为戒！</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-29 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;直接润回家！润的前一晚学校🐏了一个，润的当天🐏了一个。（润的后一天也🐏了一个）（再往后一天和我一层的同学也阳了，一层被拉走隔离了。。）<br>&emsp;&emsp;今天遇到了好多有趣的人，拼车的学姐，开出租的老父亲，做志愿奉献社会的兵哥，每个人都有着我所羡慕并且精彩的生活，<br>&emsp;&emsp;逢人便讲自己的憨厚懂事的高三儿子的出租车父亲，热情的和我讲述自己的孩子如何努力，如何憨厚可爱，如何高三了还孩子气，讲述的时候发自心底的开心与骄傲像极了我的父亲，虽然我不那么懂事（回家发现俺爹真的把烟戒了，挺开心的）。<br>&emsp;&emsp;在拼车群里拼了一天的车都没拼到去北京朝阳站的人，第二天拼到了一个林业大学的研一姐，和我一样也是趁着疫情赶紧润回家，老乡所以在一起聊了还算挺多的吧，值得感叹的是我依然还是和异性交谈九级伤残选手，也不太会表达，但单方面也没感到尴尬，如果不是一面之缘，感觉能成为朋友吧。<br>三四十号转运的人在天寒地冻的大街上冻了一个小时，怨气朝天地上了转运大巴，面对大家的埋怨挖苦，开车的军人哥忍气吞声还疯狂打趣，让车上的气氛缓和了下来，后来知道他是无偿来当志愿者的，理由是想要奉献社会，从早上七点干到晚上十点，很难想象一天中他咽下了多少波分流人员的怨气，令人打心底敬佩，无论如何，给别人多一些容忍与理解吧。<br>&emsp;&emsp;哈西站下了高铁，走在站里有种恍然若失的感觉，感觉愧疚又无力，不知不觉就泪流满面了。高中写了三年的触景生情，好像再今天才算真正的理解了<br>&emsp;&emsp;回家后和杭州的姐姐打了会电话，一切安好，希望今年过年的时候能见到吧<br>&emsp;&emsp;很精彩有趣的一天<br>&emsp;&emsp;三点半了，该睡觉了<br>&emsp;&emsp;晚安，陌生人</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-30 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=100% src="//music.163.com/outchain/player?type=2&id=1907766514&auto=1&height=66"></iframe></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;隔离第二天。已经感觉得到自己精神层面出了些状况，可能是真的有太多太多想找人说说吧，可大家都在忙，也不去打扰了哈哈。<br>&emsp;&emsp;感觉这么多年自己就一直都在念书，大部分还都是无用功。感觉别人的生活都好精彩啊，好想走出去看看啊。引用我彭哥的一句话“没有生活质量慢慢就抑郁了呗”，但比起身边的人我已经算是不错的了。北京看样子要解封了，脸都不要了。<br>提高自己的生活质量，，，，，<br>&emsp;&emsp;好久没更技术篇了，明天更一篇C++出来。<br>&emsp;&emsp;今天属实是没啥正能量了，，<br>&emsp;&emsp;都别跟自己过不去吧，<br>&emsp;&emsp;加油吧大伙</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-3 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;封控第四天，很难想象连续静默几个月的人的精神状态，感觉干什么都失去了兴趣，唯一的好处应该是可以给自己更多的时间思考一些问题。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;开放了评论区，用的必来力评论系统网站，大家可以放心评论不用担心号被盗哈。。。号被盗了我全责好吧</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-9 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;ELDEN RING！年度最佳 2022-12-9</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-26 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;考研结束了，兄弟们都回来了，就算家不在肇东，大家也都第一站回到了肇东。对我来说，可算有人陪着说话打游戏了，不管考得怎么样，都先把一切都放下吧，休养一段时间。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;欢度元旦，给朋友们都发了贺词，鸣谢王哥凌晨帮助我度过情感难关解开心结。希望新一年能够认识到很多志趣相投的人，多交几个朋友。多学一些知识与社会技能，提高自己的生活质量，对自己投资对自己投资对自己投资！新年愿望是让自己变得博学谦逊。女朋友等毕业了再说吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;一根藤2023年度聚首。和大伙一起去了人工湖，看了烟花，打游戏出去住。得知桂花已经找了工作，怎么感觉像是葫芦娃中大娃被妖精抓走了一样，七个人中第一个能早日实现经济自由和生活自由，工作也还不错。被珍惜的快乐才会永远封存在心底，看来大家都别来无恙，即使生活充满了挫折也在努力改变自己的人生，大家加油吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-10 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;第一次和别人微信上唠了五个小时。我自认为挺能唠的，结果遇到了更能唠的，哈哈，好像挺兴趣相投的。每次和陌生的人交谈，真的感觉是在接触另一种经历，人生。真的挺希望和别人多沟通的，感觉自己的智慧也在增长。毕设感觉也就那样了，又想读博了哈哈，但还是未来的生活更重要啊，要不起的牌就要过掉，没啥可说的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-12 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;坚持运动了一个月，跑步和腹肌撕裂者穿插，感觉非常有用，非常有用，非常有用！头脑变得很清晰，感觉回到了头脑巅峰期。肺活量上原来能闭气几十秒，现在轻松两分钟。腹肌也有型了，练了十几次确实成效显著。继续坚持！</p></div></div></div>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 日记 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>新年</title>
+      <link href="/%E6%96%B0%E5%B9%B4/"/>
+      <url>/%E6%96%B0%E5%B9%B4/</url>
+      
+        <content type="html"><![CDATA[<p>要开始新的一年了，过去的一年发生了好多事。</p><p>下了高铁，五味陈杂，不知不觉就泪流满面了。</p><p>生活中有太多的不可抗力了，有太多抓不住的飘渺，有太多心酸和不甘。发现自己活在自己给自己编织的梦里，才被现实一次又一次的打败。</p><p>这些都已经过去了，<br>我觉得真的好可惜，但也只能嘴硬一句仅此而已，别无他法。</p><p>谁都战胜不了生活，但无论生活怎样的光怪陆离与造化弄人，无论怎样无法原谅自己，我都要和生活和解，和自己和解。</p><p>生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，能给生活打分的人也只有自己。</p><p>所以我只觉得可惜，仅此而已。</p><p>不一定会有怎样美好的结局能配得上这一路的颠沛流离。<br>但它一定是能令自己释怀的结局。</p><p>所以我不打算把过去的事情放在心上。<br>一件一件地后悔下去，会没完没了的。<br>我能做的，也只有成为更纯粹的自己。</p><p>又是一年的同学聚会<br>去年的冬天，上一次是在魏老大烧烤，不过当时可以看出，虽然大家都在谈笑风生，但谈到未来，每个人都对未来有些许迷茫和担忧。毕竟面对能决定命运的事件，谁又能坦然以对呢。<br>“一年以后就真的尘埃落定了吧”，我这样和彭哥说。怎样的相互安慰也难掩心中的沉重，因为要面对考研了，要在八比一，十比一的比例中脱颖而出，真的好难呢。在和鸣谈到考研时，发现鸣早已起步，暑假也打算不回来了，在学校备考，对比一下决心，感觉弗如远甚。<br>不知道别人当时在想什么，我当时就在想，“一年以后的现在，大家都会怎样呢”。</p><p>2023 1 4 ，大四的冬天，</p><p>今年的冬天，再次相聚。<br>这次也是看到了大家在一年以后怎么样了，算是给去年的惆怅一个答复。<br>有的考研充满希望，有的找了工作，有的准备二战。但我发现我好像不在意大家有了怎样的结果，我在意的是大家面对考研和找工作的不同的态度。<br>大家都已经有了很明确的规划，准备复试的复试，准备工作搞钱的搞钱，准备二战的也摆脱了心结在重新规划。<br>说实话，我发自内心为我的朋友们感到骄傲，我也从他们身上受到了鼓舞。<br>面对变化莫测的未来，每个人都在用最饱满的一面面对着生活，接受着生活，而不是将自己交给迷茫，随遇而安。</p><p>—生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，自己能释怀就可以了。</p><p>或许这是一根藤最后一次在肇东聚首了吧，谁知道呢<br>就算还能聚，剩下几次了呢。<br>不想去想。<br>我惭愧自己后知后觉，在尾声时才珍惜友情的可贵。<br>从今往后，或许真的天各一方了，或许真的杳无音讯了。<br>如今摆在大家面前的是以后在哪就业，在哪扎根生活的问题。<br>但随着时间推移，这些问题也不算是问题了<br>引用尧的一句话：毕业了以后，三年内，工作，相亲，结婚，买楼，要孩子，基本全都定下来了。<br>是啊，时间的车轮会把一切都辗出痕迹，无论你愿不愿意。<br>五年后，人生就真的定型了吧<br>或许这就是命运吧。<br>七个人，七种不同的命运。<br>无论面临怎样的命运，希望我们在认命的同时，都能看开吧。<br>望着人工湖上的烟花，仿佛心中又燃起了希望，<br>可惜烟花易冷，消散之后黑夜中又只剩下渺小的自己，<br>但希望虽小，却也经常燃起。<br>请对生活充满热情。</p><p><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/47ADA6D4D8E5950AFA63B7F7671FEAF8.png" alt="一根藤高级会议"><br><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/1F8CDA135A8BFF100FA6644CA5AD9089.png" alt="人工湖"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 日记 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>人们为什么想在大城市定居？</title>
       <link href="/%E5%8C%97%E4%B8%8A%E5%B9%BF%E6%B7%B1/"/>
       <url>/%E5%8C%97%E4%B8%8A%E5%B9%BF%E6%B7%B1/</url>
@@ -229,48 +279,23 @@
     
     
     <entry>
-      <title>开发者日志</title>
-      <link href="/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/"/>
-      <url>/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/</url>
+      <title>第一性原则</title>
+      <link href="/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/"/>
+      <url>/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/</url>
       
-        <content type="html"><![CDATA[<div class="note default simple"><p>default 开发者日志</p></div><div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴样式</p></div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-21 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases">1.0</a></p></div></div><div class='timeline-item-content'><p>本博客网站开服，作者：yhl2333<br>学校：五道口信息技术学院<br>邮箱：1652966670@qq.com</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;好不容易把bug改完了，把功能实现了。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.6">1.0 -&gt; 1.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月23日，新增了留言新功能，希望大家可以对博客网站提出建设性意见或者有什么想留言的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-25 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月25日，本着精益求精的态度，我对博客进行的大幅度的美化与修缮，成功实现了白天黑夜不同的界面显示与特效。这个过程历时整整一天，出现的问题：修改博客文件后在本地 host:4000端口打开的效果和在浏览器中服务器IP地址打开的效果不同，不同之处在于修改的部分没有显示。进过多次调试查证发现是浏览器自己的数据缓存功能，慨叹自己如此伞兵的同时也对浏览器的搜索引擎的检索能力提出质疑。浏览器的数据缓存：浏览器在加载网页之后会将内容缓存到你的设备上，当你再次访问（包括刷新网页）这个网站就会优先显示上一次加载缓存过的结果，而不是默认立即从服务器上更新全部网站内容，不然1GB的流量打开几个图片量大的网页就都没了。这也就导致了网站的开发者修改过服务器上的资源后刷新网址网址会没有任何变化，望诸位前后端开发者引以为戒！</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-29 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;直接润回家！润的前一晚学校🐏了一个，润的当天🐏了一个。（润的后一天也🐏了一个）（再往后一天和我一层的同学也阳了，一层被拉走隔离了。。）<br>&emsp;&emsp;今天遇到了好多有趣的人，拼车的学姐，开出租的老父亲，做志愿奉献社会的兵哥，每个人都有着我所羡慕并且精彩的生活，<br>&emsp;&emsp;逢人便讲自己的憨厚懂事的高三儿子的出租车父亲，热情的和我讲述自己的孩子如何努力，如何憨厚可爱，如何高三了还孩子气，讲述的时候发自心底的开心与骄傲像极了我的父亲，虽然我不那么懂事（回家发现俺爹真的把烟戒了，挺开心的）。<br>&emsp;&emsp;在拼车群里拼了一天的车都没拼到去北京朝阳站的人，第二天拼到了一个林业大学的研一姐，和我一样也是趁着疫情赶紧润回家，老乡所以在一起聊了还算挺多的吧，值得感叹的是我依然还是和异性交谈九级伤残选手，也不太会表达，但单方面也没感到尴尬，如果不是一面之缘，感觉能成为朋友吧。<br>三四十号转运的人在天寒地冻的大街上冻了一个小时，怨气朝天地上了转运大巴，面对大家的埋怨挖苦，开车的军人哥忍气吞声还疯狂打趣，让车上的气氛缓和了下来，后来知道他是无偿来当志愿者的，理由是想要奉献社会，从早上七点干到晚上十点，很难想象一天中他咽下了多少波分流人员的怨气，令人打心底敬佩，无论如何，给别人多一些容忍与理解吧。<br>&emsp;&emsp;哈西站下了高铁，走在站里有种恍然若失的感觉，感觉愧疚又无力，不知不觉就泪流满面了。高中写了三年的触景生情，好像再今天才算真正的理解了<br>&emsp;&emsp;回家后和杭州的姐姐打了会电话，一切安好，希望今年过年的时候能见到吧<br>&emsp;&emsp;很精彩有趣的一天<br>&emsp;&emsp;三点半了，该睡觉了<br>&emsp;&emsp;晚安，陌生人</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-30 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=100% src="//music.163.com/outchain/player?type=2&id=1907766514&auto=1&height=66"></iframe></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;隔离第二天。已经感觉得到自己精神层面出了些状况，可能是真的有太多太多想找人说说吧，可大家都在忙，也不去打扰了哈哈。<br>&emsp;&emsp;感觉这么多年自己就一直都在念书，大部分还都是无用功。感觉别人的生活都好精彩啊，好想走出去看看啊。引用我彭哥的一句话“没有生活质量慢慢就抑郁了呗”，但比起身边的人我已经算是不错的了。北京看样子要解封了，脸都不要了。<br>提高自己的生活质量，，，，，<br>&emsp;&emsp;好久没更技术篇了，明天更一篇C++出来。<br>&emsp;&emsp;今天属实是没啥正能量了，，<br>&emsp;&emsp;都别跟自己过不去吧，<br>&emsp;&emsp;加油吧大伙</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-3 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;封控第四天，很难想象连续静默几个月的人的精神状态，感觉干什么都失去了兴趣，唯一的好处应该是可以给自己更多的时间思考一些问题。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;开放了评论区，用的必来力评论系统网站，大家可以放心评论不用担心号被盗哈。。。号被盗了我全责好吧</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-9 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;ELDEN RING！年度最佳 2022-12-9</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-26 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;考研结束了，兄弟们都回来了，就算家不在肇东，大家也都第一站回到了肇东。对我来说，可算有人陪着说话打游戏了，不管考得怎么样，都先把一切都放下吧，休养一段时间。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;欢度元旦，给朋友们都发了贺词，鸣谢王哥凌晨帮助我度过情感难关解开心结。希望新一年能够认识到很多志趣相投的人，多交几个朋友。多学一些知识与社会技能，提高自己的生活质量，对自己投资对自己投资对自己投资！新年愿望是让自己变得博学谦逊。女朋友等毕业了再说吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;一根藤2023年度聚首。和大伙一起去了人工湖，看了烟花，打游戏出去住。得知桂花已经找了工作，怎么感觉像是葫芦娃中大娃被妖精抓走了一样，七个人中第一个能早日实现经济自由和生活自由，工作也还不错。被珍惜的快乐才会永远封存在心底，看来大家都别来无恙，即使生活充满了挫折也在努力改变自己的人生，大家加油吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-10 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;第一次和别人微信上唠了五个小时。我自认为挺能唠的，结果遇到了更能唠的，哈哈，好像挺兴趣相投的。每次和陌生的人交谈，真的感觉是在接触另一种经历，人生。真的挺希望和别人多沟通的，感觉自己的智慧也在增长。毕设感觉也就那样了，又想读博了哈哈，但还是未来的生活更重要啊，要不起的牌就要过掉，没啥可说的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-12 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;坚持运动了一个月，跑步和腹肌撕裂者穿插，感觉非常有用，非常有用，非常有用！头脑变得很清晰，感觉回到了头脑巅峰期。肺活量上原来能闭气几十秒，现在轻松两分钟。腹肌也有型了，练了十几次确实成效显著。继续坚持！</p></div></div></div>]]></content>
+        <content type="html"><![CDATA[<p>&emsp;&emsp;拥有特斯拉，SpaceX，Twiter的马斯克所说的第一性原则是个啥？跟他的成功有关系吗？</p><p>&emsp;&emsp;第一性原理指的是，回归事物最基本的条件，将其拆分成各要素进行解构分析，从而找到实现目标最优路径的方法。该原理源于古希腊哲学家亚里士多德提出的一个哲学观点：“每个系统中存在一个最基本的命题，它不能被违背或删除。”</p><p>&emsp;&emsp;这段话翻译成人话的意思是：想建金字塔，就把金字塔分为n层建造，由地基往上一层一层建。最底层放的就是最牢固的，绝对不会出错的东西，因为根基不稳金字塔早晚得倒，然后依次向上，错了就把这层推倒，重新建。<br>&emsp;&emsp;就比如解数学题，你先将问题分解，反复质疑假设，分析出要用到哪个章节的数学公理，这些数学公理就是金字塔的最底层，这些东西是绝对不会出错。以此为基础向上搭建金字塔，就相当于在公理的基础上将题目给的条件恒等变形得到对你有利的结论，这一步可能你得到的是错的结论，但是你的底子是正确的，因此你不断尝试就就极有可能正确。<br>&emsp;&emsp;对马斯克来说，在其他航天制造商购买火箭成品要花6500W$,他就思考这这么贵的本质，也就是成本到底有多少，发现航天飞机本身的建材费用只占报价2%，于是他放弃购买成品转而建立了SpaceX。</p><p>&emsp;&emsp;总结：第一性原理最基本的就是思考一个事物或问题的根本真理是什么，就像在最基础的水平上，构成一个学科最简单也是大家都承认的公理是什么，然后在这些真理上往上搭建，有条理，辩证的去思考，去接近事物的本质。</p>]]></content>
       
       
       <categories>
           
-          <category> 杂谈 </category>
+          <category> 社会现象分析 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 日记 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>新年</title>
-      <link href="/%E6%96%B0%E5%B9%B4/"/>
-      <url>/%E6%96%B0%E5%B9%B4/</url>
-      
-        <content type="html"><![CDATA[<p>要开始新的一年了，过去的一年发生了好多事。</p><p>下了高铁，五味陈杂，不知不觉就泪流满面了。</p><p>生活中有太多的不可抗力了，有太多抓不住的飘渺，有太多心酸和不甘。发现自己活在自己给自己编织的梦里，才被现实一次又一次的打败。</p><p>这些都已经过去了，<br>我觉得真的好可惜，但也只能嘴硬一句仅此而已，别无他法。</p><p>谁都战胜不了生活，但无论生活怎样的光怪陆离与造化弄人，无论怎样无法原谅自己，我都要和生活和解，和自己和解。</p><p>生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，能给生活打分的人也只有自己。</p><p>所以我只觉得可惜，仅此而已。</p><p>不一定会有怎样美好的结局能配得上这一路的颠沛流离。<br>但它一定是能令自己释怀的结局。</p><p>所以我不打算把过去的事情放在心上。<br>一件一件地后悔下去，会没完没了的。<br>我能做的，也只有成为更纯粹的自己。</p><p>又是一年的一根藤高级会议<br>去年的冬天，也就是上一次一根藤高级会议在魏老大烧烤，不过当时可以看出，虽然大家都在谈笑风生，但谈到未来，每个人都对未来有些许迷茫和担忧。毕竟面对能决定命运的不确定性事件，谁又能坦然以对呢。<br>“一年以后就真的尘埃落定了吧”，我这样和彭哥说。怎样的相互安慰也难掩心中的沉重，因为要面对考研了，要在八比一，十比一的比例中脱颖而出，真的好难呢。在和鸣谈到考研时，发现鸣早已起步，暑假也打算不回来了，在学校备考，对比一下决心，感觉弗如远甚。<br>不知道别人当时在想什么，我当时就在想，“一年以后的现在，大家都会怎样呢”。</p><p>今年的冬天，一根藤再次相聚。<br>这次也是看到了大家在一年以后怎么样了，算是给去年的惆怅一个答复。<br>有的考研充满希望，有的找了工作，有的准备二战。但我发现我好像不在意大家有了怎样的结果，我在意的是大家面对考研和找工作的不同的态度。<br>大家都已经有了很明确的规划，准备复试的复试，准备工作搞钱的搞钱，准备二战的也摆脱了心结在重新规划。<br>说实话，我发自内心为我的朋友们感到骄傲，我也从他们身上受到了鼓舞。<br>面对变化莫测的未来，每个人都在用最饱满的一面面对着生活，接受着生活，而不是将自己交给迷茫，随遇而安。</p><p>—生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，自己能释怀就可以了。</p><p>2023 1 4 ，大四的冬天，或许这是一根藤最后一次在肇东聚首了吧，谁知道呢<br>就算还能聚，剩下几次了呢。<br>不想去想。<br>我惭愧自己后知后觉，在尾声时才珍惜友情的可贵。<br>从今往后，或许真的天各一方了，或许真的杳无音讯了。<br>如今摆在大家面前的是以后在哪就业，在哪扎根生活的问题。<br>但随着时间推移，这些问题也不算是问题了<br>引用尧的一句话：毕业了以后，三年内，工作，相亲，结婚，买楼，要孩子，基本全都定下来了。<br>是啊，时间的车轮会把一切都辗出痕迹，无论你愿不愿意。<br>五年后，人生就真的定型了吧<br>或许这就是命运吧。<br>七个人，七种不同的命运。<br>无论面临怎样的命运，希望我们在认命的同时，都能看开吧。<br>望着人工湖上的烟花，仿佛心中又燃起了希望，<br>可惜烟花易冷，消散之后黑夜中又只剩下渺小的自己，<br>但希望虽小，却也经常燃起。<br>请对生活充满热情。</p><p><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/47ADA6D4D8E5950AFA63B7F7671FEAF8.png" alt="一根藤高级会议"><br><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/1F8CDA135A8BFF100FA6644CA5AD9089.png" alt="人工湖"></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 日记 </tag>
+            <tag> 第一性原则 </tag>
             
         </tags>
       
@@ -304,23 +329,23 @@
     
     
     <entry>
-      <title>第一性原则</title>
-      <link href="/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/"/>
-      <url>/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/</url>
+      <title>博客设计初衷</title>
+      <link href="/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/"/>
+      <url>/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/</url>
       
-        <content type="html"><![CDATA[<p>&emsp;&emsp;拥有特斯拉，SpaceX，Twiter的马斯克所说的第一性原则是个啥？跟他的成功有关系吗？</p><p>&emsp;&emsp;第一性原理指的是，回归事物最基本的条件，将其拆分成各要素进行解构分析，从而找到实现目标最优路径的方法。该原理源于古希腊哲学家亚里士多德提出的一个哲学观点：“每个系统中存在一个最基本的命题，它不能被违背或删除。”</p><p>&emsp;&emsp;这段话翻译成人话的意思是：想建金字塔，就把金字塔分为n层建造，由地基往上一层一层建。最底层放的就是最牢固的，绝对不会出错的东西，因为根基不稳金字塔早晚得倒，然后依次向上，错了就把这层推倒，重新建。<br>&emsp;&emsp;就比如解数学题，你先将问题分解，反复质疑假设，分析出要用到哪个章节的数学公理，这些数学公理就是金字塔的最底层，这些东西是绝对不会出错。以此为基础向上搭建金字塔，就相当于在公理的基础上将题目给的条件恒等变形得到对你有利的结论，这一步可能你得到的是错的结论，但是你的底子是正确的，因此你不断尝试就就极有可能正确。<br>&emsp;&emsp;对马斯克来说，在其他航天制造商购买火箭成品要花6500W$,他就思考这这么贵的本质，也就是成本到底有多少，发现航天飞机本身的建材费用只占报价2%，于是他放弃购买成品转而建立了SpaceX。</p><p>&emsp;&emsp;总结：第一性原理最基本的就是思考一个事物或问题的根本真理是什么，就像在最基础的水平上，构成一个学科最简单也是大家都承认的公理是什么，然后在这些真理上往上搭建，有条理，辩证的去思考，去接近事物的本质。</p>]]></content>
+        <content type="html"><![CDATA[<p>、<br>&emsp;&emsp;今天是2022年11月21日，也是本人在博客网站几乎完成了所有的基础构建，开服的第一天。关于我为什么要创建博客，大概是想从自己的世界进入到外面的世界吧，感觉过去的自己烂透了，因此我想充分的利用闲暇时间提升一下个人能力与素养，相当于写写日记，记录一下平时的所看所学所想，整理我在研究生生涯的学习思路与内容。在这个经济低迷，硕士博士遍地而无offer的时代，广泛的涉猎，融会贯通变得越来越重要。这是一个靠能力而非学历的时代，也是一个疯狂内卷内耗的时代，希望各位都能乐观豁达地面对苦难，没有什么过不去的坎，但也别和自己过不去，对自己温柔一点，加油！</p><p>&emsp;&emsp;我呢，就是个普通人，因此我想将自己的学习，生活中的历程与踩过的坑分享给大家，帮助同样是想要学习一些热门知识并且想要交流沟通的人。相信已经学四年的你一定知道能否得到帮助的重要性，在本网站中，我会先将学习的内容分成以下几个我目前在学的大类，在这些类中我会分享我在学习中所看过的好的视频，通俗易懂的CSDN，知乎，简书以及我个人的梳理与理解。目前几个大类应该是：C++编程（QT），机器学习强化学习，计网与操作系统，硬软件茶谈（比如软硬件，服务器的使用手册等常识性知识）。</p><p>&emsp;&emsp;搭建整个博客耗费了两天时间，保研以后空出的时间多了起来，我也在广泛学习一些网络技术以及编程技术，博客就是主要开发的项目之一，我也推荐大家记录一些生活中的故事，在现如今如此快节奏且无意义的生活中给自己留一点空间，反思提升自己显得格外珍贵，更新周期的话每周一更吧，一到两篇，总之大伙加油吧。</p><p>&emsp;&emsp;给大家推荐一首室友黄某推荐的歌：<a href="https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
           
-          <category> 社会现象分析 </category>
+          <category> 杂谈 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> 第一性原则 </tag>
+            <tag> 个人 </tag>
             
         </tags>
       
@@ -398,6 +423,31 @@
     
     
     <entry>
+      <title>QT如何连接mysql</title>
+      <link href="/database/"/>
+      <url>/database/</url>
+      
+        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 指针，踩坑 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C++笔记</title>
       <link href="/python/"/>
       <url>/python/</url>
@@ -448,31 +498,6 @@
     
     
     <entry>
-      <title>QT如何连接mysql</title>
-      <link href="/database/"/>
-      <url>/database/</url>
-      
-        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 指针，踩坑 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>操作系统的发展简史</title>
       <link href="/x86/"/>
       <url>/x86/</url>
@@ -511,31 +536,6 @@
           
       </categories>
       
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>博客设计初衷</title>
-      <link href="/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/"/>
-      <url>/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/</url>
-      
-        <content type="html"><![CDATA[<p>、<br>&emsp;&emsp;今天是2022年11月21日，也是本人在博客网站几乎完成了所有的基础构建，开服的第一天。关于我为什么要创建博客，大概是想从自己的世界进入到外面的世界吧，感觉过去的自己烂透了，因此我想充分的利用闲暇时间提升一下个人能力与素养，相当于写写日记，记录一下平时的所看所学所想，整理我在研究生生涯的学习思路与内容。在这个经济低迷，硕士博士遍地而无offer的时代，广泛的涉猎，融会贯通变得越来越重要。这是一个靠能力而非学历的时代，也是一个疯狂内卷内耗的时代，希望各位都能乐观豁达地面对苦难，没有什么过不去的坎，但也别和自己过不去，对自己温柔一点，加油！</p><p>&emsp;&emsp;我呢，就是个普通人，因此我想将自己的学习，生活中的历程与踩过的坑分享给大家，帮助同样是想要学习一些热门知识并且想要交流沟通的人。相信已经学四年的你一定知道能否得到帮助的重要性，在本网站中，我会先将学习的内容分成以下几个我目前在学的大类，在这些类中我会分享我在学习中所看过的好的视频，通俗易懂的CSDN，知乎，简书以及我个人的梳理与理解。目前几个大类应该是：C++编程（QT），机器学习强化学习，计网与操作系统，硬软件茶谈（比如软硬件，服务器的使用手册等常识性知识）。</p><p>&emsp;&emsp;搭建整个博客耗费了两天时间，保研以后空出的时间多了起来，我也在广泛学习一些网络技术以及编程技术，博客就是主要开发的项目之一，我也推荐大家记录一些生活中的故事，在现如今如此快节奏且无意义的生活中给自己留一点空间，反思提升自己显得格外珍贵，更新周期的话每周一更吧，一到两篇，总之大伙加油吧。</p><p>&emsp;&emsp;给大家推荐一首室友黄某推荐的歌：<a href="https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 个人 </tag>
-            
-        </tags>
       
     </entry>
     
