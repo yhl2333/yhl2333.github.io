@@ -29,31 +29,6 @@
     
     
     <entry>
-      <title>TCP的三次握手</title>
-      <link href="/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"/>
-      <url>/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;TCP协议是传输层里面的一个协议，TCP在建立连接之前进行的三次握手对于很多人来说可能一直是迷。干嘛要握三次手？握其他次数不行咩？<br>那么我们就来讲讲TCP的三次握手都干了些什么吧（才疏学浅，说错的地方希望大家指正）<br><img src="/img/three.png" alt="TCP三次握手"><br>一、首先要明确三次握手的目的是什么？<br>三次握手的目的是为了确认客户端和服务端的收发功能是正常的。</p><p>那么就是需确认的东西一共有4个：<br>&emsp;&emsp;1.客户端的发送功能；<br>&emsp;&emsp;2.客户端的接收功能；<br>&emsp;&emsp;3.服务端的发送功能；<br>&emsp;&emsp;4.服务端的接收功能；</p><p>二、那三次握手分别都确认了哪些功能呢？<br>1、第一次握手<br>&emsp;&emsp;第一次握手是客户端主动发起的，简单粗暴的理解就是客户端给服务端写了一封信；<br>&emsp;&emsp;这就跟以前的人寄信一样，我自己知道自己是把信放进了邮箱里面，但是我并不知道邮差是不是把它拿出来寄出去了，<br>&emsp;&emsp;也就是说，客户端只知道自己发送了报文，但是报文有没有被发送出去就不知道，所以这个时候客户端对于自己的发送功能是否完好是不确定的；<br>&emsp;&emsp;但是当第一次握手的报文被送达服务端的时候，服务端就知道自己的接收功能是完好的了；因为它已经收到了嘛；<br>&emsp;&emsp;所以第一次握手就确定服务端的接收功能（括号内为握手编号）：<br><img src="/img/first.png" alt="第一次握手验证的功能"><br>注意：你可能会说，服务端收到客户端的信了，看到信了不就可以知道客户端的发送功能是完好的了吗？很遗憾，我们要让客户端知道 自己 的发送功能和接收功能是正常的；要让服务端知道 自己 的发送和接收功能是正常的，这也是为什么客户端发送一个seq=x,服务端要回信一个ack=x+1，这就是第二次握手时告诉客户端你发送的具体内容我可以收到，因为我回的是你发内容+1！这样客户端在第二次握手就知道自己的发送功能正常了！</p><p>2.第二次握手<br>第一次握手是客户端发起的，第二次握手就是服务器端发起的；<br>别人给你写了信，你收到了肯定就要回信嘛；<br>那么这个时候我们就可以来看一下参数（为了方便理解，我们暂时将报文信息理解成参数）：<br>第一次握手客户端会给服务端传过去两个参数，其中有一个是：seq=x;<br>SYN我们先不管，这个seq=x我们就可以看成是写在信里的内容；<br>第二次握手的时候服务器端给客户端返回的是4个参数，其中有2个是：seq=y;ack=x+1<br>那么这个ack=x+1我们就可以理解成是回答了客户端写在信里的内容，因为来信是x，客户端接收到来自服务端的x+1的时候就知道自己写出去的东西被收到了；就可以知道自己的发送功能的正常的；同时客户端也能知道自己的接收功能是正常的，因为能够接收来自服务器端的消息；<br>那为什么服务端也要写出信息seq=x给客户端呢？<br>因为服务端也不知道自己的发送功能是否正确嘛；<br>所以在第二次握手里面可以确定的功能是：<br><img src="/img/second.png" alt="第二次握手验证的功能"></p><p>3.第三次握手<br>第三次握手是客户端发起的，就是这么一来一回的；<br>在第二次握手里面我们就知道握手和确认功能完善之间的逻辑，那么接下来也只剩下一个功能，就是服务端的接收功能；<br>服务端怎么知道自己的发送功能是正确的呢？<br>类比第二次握手我们就知道了，只要收到客户端关于seq的回答就好了；<br>第二次握手的时候服务向客户端发送了seq=y<br>有seq发出去，那么客户端就要将对信的回复写在ack里面；<br>所以第三次握手所传的参数里面有ack=y+1，也就是说客户端回复了服务端的seq;<br>当服务端接收到这个反馈的时候就知道自己的发送功能的正确的了。<br><img src="/img/third.png" alt="第三次握手验证的功能"></p><p>总之呢就是一句话：能接收就说明接收功能正常；但是能发送不一定代表发送功能正常，发送功能需要通过 seq(写信)和ack(回信) 才能判断。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Tcp，三次握手 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>QT中的UDP，UDP与TCP比较</title>
       <link href="/UDP/"/>
       <url>/UDP/</url>
@@ -71,6 +46,31 @@
         <tags>
             
             <tag> UDP TCP </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>TCP的三次握手</title>
+      <link href="/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"/>
+      <url>/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;TCP协议是传输层里面的一个协议，TCP在建立连接之前进行的三次握手对于很多人来说可能一直是迷。干嘛要握三次手？握其他次数不行咩？<br>那么我们就来讲讲TCP的三次握手都干了些什么吧（才疏学浅，说错的地方希望大家指正）<br><img src="/img/three.png" alt="TCP三次握手"><br>一、首先要明确三次握手的目的是什么？<br>三次握手的目的是为了确认客户端和服务端的收发功能是正常的。</p><p>那么就是需确认的东西一共有4个：<br>&emsp;&emsp;1.客户端的发送功能；<br>&emsp;&emsp;2.客户端的接收功能；<br>&emsp;&emsp;3.服务端的发送功能；<br>&emsp;&emsp;4.服务端的接收功能；</p><p>二、那三次握手分别都确认了哪些功能呢？<br>1、第一次握手<br>&emsp;&emsp;第一次握手是客户端主动发起的，简单粗暴的理解就是客户端给服务端写了一封信；<br>&emsp;&emsp;这就跟以前的人寄信一样，我自己知道自己是把信放进了邮箱里面，但是我并不知道邮差是不是把它拿出来寄出去了，<br>&emsp;&emsp;也就是说，客户端只知道自己发送了报文，但是报文有没有被发送出去就不知道，所以这个时候客户端对于自己的发送功能是否完好是不确定的；<br>&emsp;&emsp;但是当第一次握手的报文被送达服务端的时候，服务端就知道自己的接收功能是完好的了；因为它已经收到了嘛；<br>&emsp;&emsp;所以第一次握手就确定服务端的接收功能（括号内为握手编号）：<br><img src="/img/first.png" alt="第一次握手验证的功能"><br>注意：你可能会说，服务端收到客户端的信了，看到信了不就可以知道客户端的发送功能是完好的了吗？很遗憾，我们要让客户端知道 自己 的发送功能和接收功能是正常的；要让服务端知道 自己 的发送和接收功能是正常的，这也是为什么客户端发送一个seq=x,服务端要回信一个ack=x+1，这就是第二次握手时告诉客户端你发送的具体内容我可以收到，因为我回的是你发内容+1！这样客户端在第二次握手就知道自己的发送功能正常了！</p><p>2.第二次握手<br>第一次握手是客户端发起的，第二次握手就是服务器端发起的；<br>别人给你写了信，你收到了肯定就要回信嘛；<br>那么这个时候我们就可以来看一下参数（为了方便理解，我们暂时将报文信息理解成参数）：<br>第一次握手客户端会给服务端传过去两个参数，其中有一个是：seq=x;<br>SYN我们先不管，这个seq=x我们就可以看成是写在信里的内容；<br>第二次握手的时候服务器端给客户端返回的是4个参数，其中有2个是：seq=y;ack=x+1<br>那么这个ack=x+1我们就可以理解成是回答了客户端写在信里的内容，因为来信是x，客户端接收到来自服务端的x+1的时候就知道自己写出去的东西被收到了；就可以知道自己的发送功能的正常的；同时客户端也能知道自己的接收功能是正常的，因为能够接收来自服务器端的消息；<br>那为什么服务端也要写出信息seq=x给客户端呢？<br>因为服务端也不知道自己的发送功能是否正确嘛；<br>所以在第二次握手里面可以确定的功能是：<br><img src="/img/second.png" alt="第二次握手验证的功能"></p><p>3.第三次握手<br>第三次握手是客户端发起的，就是这么一来一回的；<br>在第二次握手里面我们就知道握手和确认功能完善之间的逻辑，那么接下来也只剩下一个功能，就是服务端的接收功能；<br>服务端怎么知道自己的发送功能是正确的呢？<br>类比第二次握手我们就知道了，只要收到客户端关于seq的回答就好了；<br>第二次握手的时候服务向客户端发送了seq=y<br>有seq发出去，那么客户端就要将对信的回复写在ack里面；<br>所以第三次握手所传的参数里面有ack=y+1，也就是说客户端回复了服务端的seq;<br>当服务端接收到这个反馈的时候就知道自己的发送功能的正确的了。<br><img src="/img/third.png" alt="第三次握手验证的功能"></p><p>总之呢就是一句话：能接收就说明接收功能正常；但是能发送不一定代表发送功能正常，发送功能需要通过 seq(写信)和ack(回信) 才能判断。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Tcp，三次握手 </tag>
             
         </tags>
       
@@ -279,31 +279,6 @@
     
     
     <entry>
-      <title>第一性原则</title>
-      <link href="/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/"/>
-      <url>/%E7%AC%AC%E4%B8%80%E6%80%A7%E5%8E%9F%E5%88%99/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;拥有特斯拉，SpaceX，Twiter的马斯克所说的第一性原则是个啥？跟他的成功有关系吗？</p><p>&emsp;&emsp;第一性原理指的是，回归事物最基本的条件，将其拆分成各要素进行解构分析，从而找到实现目标最优路径的方法。该原理源于古希腊哲学家亚里士多德提出的一个哲学观点：“每个系统中存在一个最基本的命题，它不能被违背或删除。”</p><p>&emsp;&emsp;这段话翻译成人话的意思是：想建金字塔，就把金字塔分为n层建造，由地基往上一层一层建。最底层放的就是最牢固的，绝对不会出错的东西，因为根基不稳金字塔早晚得倒，然后依次向上，错了就把这层推倒，重新建。<br>&emsp;&emsp;就比如解数学题，你先将问题分解，反复质疑假设，分析出要用到哪个章节的数学公理，这些数学公理就是金字塔的最底层，这些东西是绝对不会出错。以此为基础向上搭建金字塔，就相当于在公理的基础上将题目给的条件恒等变形得到对你有利的结论，这一步可能你得到的是错的结论，但是你的底子是正确的，因此你不断尝试就就极有可能正确。<br>&emsp;&emsp;对马斯克来说，在其他航天制造商购买火箭成品要花6500W$,他就思考这这么贵的本质，也就是成本到底有多少，发现航天飞机本身的建材费用只占报价2%，于是他放弃购买成品转而建立了SpaceX。</p><p>&emsp;&emsp;总结：第一性原理最基本的就是思考一个事物或问题的根本真理是什么，就像在最基础的水平上，构成一个学科最简单也是大家都承认的公理是什么，然后在这些真理上往上搭建，有条理，辩证的去思考，去接近事物的本质。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 社会现象分析 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 第一性原则 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>为什么毕业生越来越难了?</title>
       <link href="/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/"/>
       <url>/%E6%AF%95%E4%B8%9A%E5%BF%A7%E9%83%81/</url>
@@ -354,6 +329,31 @@
     
     
     <entry>
+      <title>C++笔记</title>
+      <link href="/C-%E8%B8%A9%E5%9D%91/"/>
+      <url>/C-%E8%B8%A9%E5%9D%91/</url>
+      
+        <content type="html"><![CDATA[<!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于常量指针与指针常量</p><pre><code>const int *p=&amp;a ; </code></pre><p>const 修饰的是取 <em>的操作，因此取星操作不能改变，就是 </em>p的值(p所指的内容)不可改变 ，但指针的方向可以改变。<br><img src="/img/5.png" alt="">  </p><pre><code>int * const p = &amp;a ; </code></pre><p>const修饰的是p这个指针，因此这个指针的指向固定了，但是指针所指的内容可以改变。<br><img src="/img/4.png" alt=""><br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于栈空间返回值用指针与别名接收</p><pre><code>int test01()&#123;    int a=10;    return a;&#125;int main()&#123;    int &amp;ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255</p><p>原因，拿别名指向返回值，但test01()执行完后，该返回值所在空间被释放了，编译器会默认保留返回值一次。<br>同理：<br>    int test01()<br>    {<br>        int a=10;<br>        return &amp;a ;<br>    }</p><pre><code>int main()&#123;    int *ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255<br>也是一个原因。其本质都是指针指向了一个被释放的栈空间而编译器只保留了一次。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>.h文件中定义的变量， .cpp中的所有函数都可以使用,并且相当于在.cpp中定义的静态变量，只要类运行不结束，变量就不会被释放。但在构造函数中定义的变量，无法在.cpp文件中除构造函数的其他函数中使用，因为构造函数相当于一个函数，执行完构造函数就被释放掉了，需要注意的是执行完构造函数后，该class不一定会结束。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>QString buf =”123”;<br>如何将QString转化为QByteArray？QByteArray a = buf.toUtf8();这里的QByteArray是由UTF-8编码，为了对应中文问题，也可选择其他编码，依然属于QByteArray类型。<br>如何再将得到的QByteArray 类型的a转化为 char<em> 类型（即c++的string,buf为QT的string）呢？: char</em>b=a.data();<br>如何再将得到的QByteArray 类型的a转化为 QString 类型？：QString（a）<br>如何将char<em> 转化为QString呢？QString c = QString(b);<br>这样三种类型形成了闭环。<br>qDebug()&lt;&lt;;指定的是char</em>类型。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline -->]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 指针，踩坑 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C++线程</title>
       <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
       <url>/C-%E7%BA%BF%E7%A8%8B/</url>
@@ -379,11 +379,11 @@
     
     
     <entry>
-      <title>C++笔记</title>
-      <link href="/C-%E8%B8%A9%E5%9D%91/"/>
-      <url>/C-%E8%B8%A9%E5%9D%91/</url>
+      <title>QT如何连接mysql</title>
+      <link href="/database/"/>
+      <url>/database/</url>
       
-        <content type="html"><![CDATA[<!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于常量指针与指针常量</p><pre><code>const int *p=&amp;a ; </code></pre><p>const 修饰的是取 <em>的操作，因此取星操作不能改变，就是 </em>p的值(p所指的内容)不可改变 ，但指针的方向可以改变。<br><img src="/img/5.png" alt="">  </p><pre><code>int * const p = &amp;a ; </code></pre><p>const修饰的是p这个指针，因此这个指针的指向固定了，但是指针所指的内容可以改变。<br><img src="/img/4.png" alt=""><br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于栈空间返回值用指针与别名接收</p><pre><code>int test01()&#123;    int a=10;    return a;&#125;int main()&#123;    int &amp;ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255</p><p>原因，拿别名指向返回值，但test01()执行完后，该返回值所在空间被释放了，编译器会默认保留返回值一次。<br>同理：<br>    int test01()<br>    {<br>        int a=10;<br>        return &amp;a ;<br>    }</p><pre><code>int main()&#123;    int *ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255<br>也是一个原因。其本质都是指针指向了一个被释放的栈空间而编译器只保留了一次。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>.h文件中定义的变量， .cpp中的所有函数都可以使用,并且相当于在.cpp中定义的静态变量，只要类运行不结束，变量就不会被释放。但在构造函数中定义的变量，无法在.cpp文件中除构造函数的其他函数中使用，因为构造函数相当于一个函数，执行完构造函数就被释放掉了，需要注意的是执行完构造函数后，该class不一定会结束。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>QString buf =”123”;<br>如何将QString转化为QByteArray？QByteArray a = buf.toUtf8();这里的QByteArray是由UTF-8编码，为了对应中文问题，也可选择其他编码，依然属于QByteArray类型。<br>如何再将得到的QByteArray 类型的a转化为 char<em> 类型（即c++的string,buf为QT的string）呢？: char</em>b=a.data();<br>如何再将得到的QByteArray 类型的a转化为 QString 类型？：QString（a）<br>如何将char<em> 转化为QString呢？QString c = QString(b);<br>这样三种类型形成了闭环。<br>qDebug()&lt;&lt;;指定的是char</em>类型。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline -->]]></content>
+        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>show databases;<br>看到数据库里的存储区<br>use info<br>进入其中的一个存储区<br>show tables;<br>可以看到区里具体的表<br>select * from 表名<br>可以看到表里有啥</p><p>tips:<br>    QString sql1 = QString(“create table %1(id double,x double,y double,h double,v double,t double)”).arg(a);<br>这样可以实现动态设置表名，例如如果需要把每个for循环采集到的数据做成一个表，那么就可以这样动态设置表名<br>表名必须是字母！<br>也可以用函数获取当前的绝对时间，arg(时间)，来实现动态设置表名</p>]]></content>
       
       
       <categories>
@@ -417,31 +417,6 @@
           
       </categories>
       
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>QT如何连接mysql</title>
-      <link href="/database/"/>
-      <url>/database/</url>
-      
-        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 指针，踩坑 </tag>
-            
-        </tags>
       
     </entry>
     
