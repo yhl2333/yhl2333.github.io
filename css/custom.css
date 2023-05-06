@@ -211,3 +211,17 @@ div#archive {
   background: rgba(25, 25, 25, 0.9) !important;
   color: #ffffff;
 }
+
+/* 个人信息卡片背景图 */
+[data-theme="light"] #aside-content > .card-widget.card-info {
+  background-image: url(https://blog-1315294080.cos.ap-beijing.myqcloud.com/winter.png);
+  background-repeat: no-repeat;
+  background-attachment: inherit;
+  background-size: 100%;
+}
+[data-theme="dark"] #aside-content > .card-widget.card-info {
+  background-image: url(https://blog-1315294080.cos.ap-beijing.myqcloud.com/jiguang.png);
+  background-repeat: no-repeat;
+  background-attachment: inherit;
+  background-size: 100%;
+}
