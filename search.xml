@@ -54,31 +54,6 @@
     
     
     <entry>
-      <title>TCP的三次握手</title>
-      <link href="/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"/>
-      <url>/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;TCP协议是传输层里面的一个协议，TCP在建立连接之前进行的三次握手对于很多人来说可能一直是迷。干嘛要握三次手？握其他次数不行咩？<br>那么我们就来讲讲TCP的三次握手都干了些什么吧（才疏学浅，说错的地方希望大家指正）<br><img src="/img/three.png" alt="TCP三次握手"><br>一、首先要明确三次握手的目的是什么？<br>三次握手的目的是为了确认客户端和服务端的收发功能是正常的。</p><p>那么就是需确认的东西一共有4个：<br>&emsp;&emsp;1.客户端的发送功能；<br>&emsp;&emsp;2.客户端的接收功能；<br>&emsp;&emsp;3.服务端的发送功能；<br>&emsp;&emsp;4.服务端的接收功能；</p><p>二、那三次握手分别都确认了哪些功能呢？<br>1、第一次握手<br>&emsp;&emsp;第一次握手是客户端主动发起的，简单粗暴的理解就是客户端给服务端写了一封信；<br>&emsp;&emsp;这就跟以前的人寄信一样，我自己知道自己是把信放进了邮箱里面，但是我并不知道邮差是不是把它拿出来寄出去了，<br>&emsp;&emsp;也就是说，客户端只知道自己发送了报文，但是报文有没有被发送出去就不知道，所以这个时候客户端对于自己的发送功能是否完好是不确定的；<br>&emsp;&emsp;但是当第一次握手的报文被送达服务端的时候，服务端就知道自己的接收功能是完好的了；因为它已经收到了嘛；<br>&emsp;&emsp;所以第一次握手就确定服务端的接收功能（括号内为握手编号）：<br><img src="/img/first.png" alt="第一次握手验证的功能"><br>注意：你可能会说，服务端收到客户端的信了，看到信了不就可以知道客户端的发送功能是完好的了吗？很遗憾，我们要让客户端知道 自己 的发送功能和接收功能是正常的；要让服务端知道 自己 的发送和接收功能是正常的，这也是为什么客户端发送一个seq=x,服务端要回信一个ack=x+1，这就是第二次握手时告诉客户端你发送的具体内容我可以收到，因为我回的是你发内容+1！这样客户端在第二次握手就知道自己的发送功能正常了！</p><p>2.第二次握手<br>第一次握手是客户端发起的，第二次握手就是服务器端发起的；<br>别人给你写了信，你收到了肯定就要回信嘛；<br>那么这个时候我们就可以来看一下参数（为了方便理解，我们暂时将报文信息理解成参数）：<br>第一次握手客户端会给服务端传过去两个参数，其中有一个是：seq=x;<br>SYN我们先不管，这个seq=x我们就可以看成是写在信里的内容；<br>第二次握手的时候服务器端给客户端返回的是4个参数，其中有2个是：seq=y;ack=x+1<br>那么这个ack=x+1我们就可以理解成是回答了客户端写在信里的内容，因为来信是x，客户端接收到来自服务端的x+1的时候就知道自己写出去的东西被收到了；就可以知道自己的发送功能的正常的；同时客户端也能知道自己的接收功能是正常的，因为能够接收来自服务器端的消息；<br>那为什么服务端也要写出信息seq=x给客户端呢？<br>因为服务端也不知道自己的发送功能是否正确嘛；<br>所以在第二次握手里面可以确定的功能是：<br><img src="/img/second.png" alt="第二次握手验证的功能"></p><p>3.第三次握手<br>第三次握手是客户端发起的，就是这么一来一回的；<br>在第二次握手里面我们就知道握手和确认功能完善之间的逻辑，那么接下来也只剩下一个功能，就是服务端的接收功能；<br>服务端怎么知道自己的发送功能是正确的呢？<br>类比第二次握手我们就知道了，只要收到客户端关于seq的回答就好了；<br>第二次握手的时候服务向客户端发送了seq=y<br>有seq发出去，那么客户端就要将对信的回复写在ack里面；<br>所以第三次握手所传的参数里面有ack=y+1，也就是说客户端回复了服务端的seq;<br>当服务端接收到这个反馈的时候就知道自己的发送功能的正确的了。<br><img src="/img/third.png" alt="第三次握手验证的功能"></p><p>总之呢就是一句话：能接收就说明接收功能正常；但是能发送不一定代表发送功能正常，发送功能需要通过 seq(写信)和ack(回信) 才能判断。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Tcp，三次握手 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>QT中的UDP，UDP与TCP比较</title>
       <link href="/UDP/"/>
       <url>/UDP/</url>
@@ -96,6 +71,31 @@
         <tags>
             
             <tag> UDP TCP </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>TCP的三次握手</title>
+      <link href="/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/"/>
+      <url>/TCP%E4%B8%89%E6%AC%A1%E6%8F%A1%E6%89%8B/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;TCP协议是传输层里面的一个协议，TCP在建立连接之前进行的三次握手对于很多人来说可能一直是迷。干嘛要握三次手？握其他次数不行咩？<br>那么我们就来讲讲TCP的三次握手都干了些什么吧（才疏学浅，说错的地方希望大家指正）<br><img src="/img/three.png" alt="TCP三次握手"><br>一、首先要明确三次握手的目的是什么？<br>三次握手的目的是为了确认客户端和服务端的收发功能是正常的。</p><p>那么就是需确认的东西一共有4个：<br>&emsp;&emsp;1.客户端的发送功能；<br>&emsp;&emsp;2.客户端的接收功能；<br>&emsp;&emsp;3.服务端的发送功能；<br>&emsp;&emsp;4.服务端的接收功能；</p><p>二、那三次握手分别都确认了哪些功能呢？<br>1、第一次握手<br>&emsp;&emsp;第一次握手是客户端主动发起的，简单粗暴的理解就是客户端给服务端写了一封信；<br>&emsp;&emsp;这就跟以前的人寄信一样，我自己知道自己是把信放进了邮箱里面，但是我并不知道邮差是不是把它拿出来寄出去了，<br>&emsp;&emsp;也就是说，客户端只知道自己发送了报文，但是报文有没有被发送出去就不知道，所以这个时候客户端对于自己的发送功能是否完好是不确定的；<br>&emsp;&emsp;但是当第一次握手的报文被送达服务端的时候，服务端就知道自己的接收功能是完好的了；因为它已经收到了嘛；<br>&emsp;&emsp;所以第一次握手就确定服务端的接收功能（括号内为握手编号）：<br><img src="/img/first.png" alt="第一次握手验证的功能"><br>注意：你可能会说，服务端收到客户端的信了，看到信了不就可以知道客户端的发送功能是完好的了吗？很遗憾，我们要让客户端知道 自己 的发送功能和接收功能是正常的；要让服务端知道 自己 的发送和接收功能是正常的，这也是为什么客户端发送一个seq=x,服务端要回信一个ack=x+1，这就是第二次握手时告诉客户端你发送的具体内容我可以收到，因为我回的是你发内容+1！这样客户端在第二次握手就知道自己的发送功能正常了！</p><p>2.第二次握手<br>第一次握手是客户端发起的，第二次握手就是服务器端发起的；<br>别人给你写了信，你收到了肯定就要回信嘛；<br>那么这个时候我们就可以来看一下参数（为了方便理解，我们暂时将报文信息理解成参数）：<br>第一次握手客户端会给服务端传过去两个参数，其中有一个是：seq=x;<br>SYN我们先不管，这个seq=x我们就可以看成是写在信里的内容；<br>第二次握手的时候服务器端给客户端返回的是4个参数，其中有2个是：seq=y;ack=x+1<br>那么这个ack=x+1我们就可以理解成是回答了客户端写在信里的内容，因为来信是x，客户端接收到来自服务端的x+1的时候就知道自己写出去的东西被收到了；就可以知道自己的发送功能的正常的；同时客户端也能知道自己的接收功能是正常的，因为能够接收来自服务器端的消息；<br>那为什么服务端也要写出信息seq=x给客户端呢？<br>因为服务端也不知道自己的发送功能是否正确嘛；<br>所以在第二次握手里面可以确定的功能是：<br><img src="/img/second.png" alt="第二次握手验证的功能"></p><p>3.第三次握手<br>第三次握手是客户端发起的，就是这么一来一回的；<br>在第二次握手里面我们就知道握手和确认功能完善之间的逻辑，那么接下来也只剩下一个功能，就是服务端的接收功能；<br>服务端怎么知道自己的发送功能是正确的呢？<br>类比第二次握手我们就知道了，只要收到客户端关于seq的回答就好了；<br>第二次握手的时候服务向客户端发送了seq=y<br>有seq发出去，那么客户端就要将对信的回复写在ack里面；<br>所以第三次握手所传的参数里面有ack=y+1，也就是说客户端回复了服务端的seq;<br>当服务端接收到这个反馈的时候就知道自己的发送功能的正确的了。<br><img src="/img/third.png" alt="第三次握手验证的功能"></p><p>总之呢就是一句话：能接收就说明接收功能正常；但是能发送不一定代表发送功能正常，发送功能需要通过 seq(写信)和ack(回信) 才能判断。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Tcp，三次握手 </tag>
             
         </tags>
       
@@ -379,31 +379,6 @@
     
     
     <entry>
-      <title>C++线程</title>
-      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
-      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
-      
-        <content type="html"><![CDATA[<p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();<br><img src="/img/thread1.png" alt=""><br>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();<br><img src="/img/thread2.png" alt=""><br>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 线程 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>C++笔记</title>
       <link href="/C-%E8%B8%A9%E5%9D%91/"/>
       <url>/C-%E8%B8%A9%E5%9D%91/</url>
@@ -429,6 +404,31 @@
     
     
     <entry>
+      <title>C++线程</title>
+      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
+      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();<br><img src="/img/thread1.png" alt=""><br>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();<br><img src="/img/thread2.png" alt=""><br>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 线程 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
       <link href="/QTwidget/"/>
       <url>/QTwidget/</url>
@@ -442,31 +442,6 @@
           
       </categories>
       
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>C++笔记</title>
-      <link href="/python/"/>
-      <url>/python/</url>
-      
-        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br>    def get_return()<br>        b=1<br>        c=2<br>        d=3<br>        return b,c,d</p><pre><code>get_b,get_c,get_d = get_return()</code></pre><!-- endtimeline --><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 软硬件 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> python技巧 </tag>
-            
-        </tags>
       
     </entry>
     
@@ -498,23 +473,23 @@
     
     
     <entry>
-      <title>操作系统的发展简史</title>
-      <link href="/x86/"/>
-      <url>/x86/</url>
+      <title>C++笔记</title>
+      <link href="/python/"/>
+      <url>/python/</url>
       
-        <content type="html"><![CDATA[<p>今天我们来聊一聊系统名词：<br>&emsp;&emsp;x86:x86是一种CPU指令集的架构，每个指令是32位，最先由Intel公司研发，x86_64表示同样基于x86指令集，但每个指令增加到64位，最先由AMD公司研发，我们电脑目前都是64位，也就是x86_64。同时64位可以兼容32位，有的软件比较古老，能在32位计算机上运行，那现在的64位电脑就可以运行。但64位的软件就不能在32位机上运行，因为位数不够。<br>&emsp;&emsp;Arm用的是32位精简指令集（x86是复杂指令集，都是同一个时期的东西），性能不行但优点是用Arm架构的产品耗能低，因此在嵌入式系统上如手机，大放异彩。手机不需要那么高的性能，但要求待机时间长，而计算机则相反，x86也就独霸了计算机领域。</p>]]></content>
+        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br>    def get_return()<br>        b=1<br>        c=2<br>        d=3<br>        return b,c,d</p><pre><code>get_b,get_c,get_d = get_return()</code></pre><!-- endtimeline --><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
       
       
       <categories>
           
-          <category> 计网与操作系统 </category>
+          <category> 软硬件 </category>
           
       </categories>
       
       
         <tags>
             
-            <tag> x86 x86_64 Arm  Intel AMD </tag>
+            <tag> python技巧 </tag>
             
         </tags>
       
@@ -540,6 +515,31 @@
         <tags>
             
             <tag> 个人 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>操作系统的发展简史</title>
+      <link href="/x86/"/>
+      <url>/x86/</url>
+      
+        <content type="html"><![CDATA[<p>今天我们来聊一聊系统名词：<br>&emsp;&emsp;x86:x86是一种CPU指令集的架构，每个指令是32位，最先由Intel公司研发，x86_64表示同样基于x86指令集，但每个指令增加到64位，最先由AMD公司研发，我们电脑目前都是64位，也就是x86_64。同时64位可以兼容32位，有的软件比较古老，能在32位计算机上运行，那现在的64位电脑就可以运行。但64位的软件就不能在32位机上运行，因为位数不够。<br>&emsp;&emsp;Arm用的是32位精简指令集（x86是复杂指令集，都是同一个时期的东西），性能不行但优点是用Arm架构的产品耗能低，因此在嵌入式系统上如手机，大放异彩。手机不需要那么高的性能，但要求待机时间长，而计算机则相反，x86也就独霸了计算机领域。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 计网与操作系统 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> x86 x86_64 Arm  Intel AMD </tag>
             
         </tags>
       
