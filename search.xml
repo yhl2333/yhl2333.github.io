@@ -79,31 +79,6 @@
     
     
     <entry>
-      <title>关于C++ QT中的Tcp</title>
-      <link href="/Tcp/"/>
-      <url>/Tcp/</url>
-      
-        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;之后服务器的套接字会向客户端套接字发送已连接信息(也是系统自己操做的，实际是tcpServer生成的tcpSocket发送)，客户端收到该信息后会产生一个connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看ip与端口的代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能监听端口，这就意味着服务器不能收发消息！怎么办呢？再在服务器端创造一个tcpSocket套接字呗。但再创造一个套接字的话就意味着上面的所有和客户端套接字的连接步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();就是在tcpServer的基础上生成一个tcpSocket。<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，由于它是在tcpServer的基础上生成一个tcpSocket，它知道通道另一端的客户端套接字的IP与端口，因此可以直接回复信息（客户端的tcpSocket连接服务器的tcpServer，服务器端的TcpServer套接字生成了一个子套接字tcpSocket，由这个子套接字tcpSocket和客户端进行收发消息通信）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字<br>我们需要明确的是：1、接受信息的一方不需要发送者的IP与port,发送信息的一方必须要知道对方的IP与port。<br>                2、tcpServer只有监听功能，服务器的收发信息功能是由它生成的tcpSocket负责的。</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> Tcp </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>QT中的UDP，UDP与TCP比较</title>
       <link href="/UDP/"/>
       <url>/UDP/</url>
@@ -121,6 +96,31 @@
         <tags>
             
             <tag> UDP TCP </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于C++ QT中的Tcp</title>
+      <link href="/Tcp/"/>
+      <url>/Tcp/</url>
+      
+        <content type="html"><![CDATA[<p>&emsp;&emsp;<br>套接字定义：应用层通过传输层进行数据通信时，TCP和UDP会遇到同时为多个应用程序进程提供并发服务的问题。多个TCP连接或多个应用程序进程可能需要通过同一个TCP协议端口传输数据。为了区别不同的应用程序进程和连接，许多计算机操作系统为应用程序与TCP／IP协议交互提供了称为套接字 (Socket)的接口（函数库），区分并实现不同应用程序进程间的网络通信和连接。<br>&emsp;&emsp;其实Socket就是一个大类，实例化两个实例，调用里面的函数就能实现通信。</p><p>&emsp;&emsp;套接字其实就是函数的接口，需要三个参数：通讯类型（Tcp，Udp），IP，端口号。Socket原意是“插座”。通过将这3个参数结合起来，与一个“插座”Socket绑定，应用层就可以和传输层通过套接字接口，区分来自不同应用程序进程或网络连接的通信，实现数据传输的并发服务。<br>&emsp;&emsp;要通过互联网进行通信，至少需要一对套接字，一个运行于客户机端，称之为ClientSocket，另一个运行于服务器端，称之为serverSocket。</p><p><img src="/img/TCP.png" alt="TCP通信流程图"><br>步骤一：把这两个套接字实例化<br>&emsp;&emsp;这两类套接字都有自己对应的代码库，实例化就行。</p><p>步骤二：连接两个套接字<br>&emsp;&emsp;根据连接启动的方式以及本地套接字要连接的目标，套接字之间的连接过程可以分为两个小步骤：1服务器套接字设置为监听，2给客户端套接字指向服务器IP与端口，并连接。<br>&emsp;&emsp;1：服务器监听过程：服务器端套接字并不定位具体的客户端套接字，也就是说并不需要客户端的IP与端口号（只需要记录说话的内容而不需要记录说话的是谁），但是要在listen函数中绑定自己的网卡对应IP与端口用于监听。这时处于等待连接的状态，实时监控网络状态。<br>tcpServer-&gt;listen(QHostAddress::Any,8888);<br>这表示服务器套接字tcpServer监听自己网卡对应的所有的IP地址以及IP地址对应的8888端口。<br>&emsp;&emsp;2：连接：是指由客户端的套接字提出连接请求（方向固定！一般都是默认客户端请求服务器），要连接的目标是服务器端的套接字。为此，客户端的套接字必须首先描述它要连接的服务器的套接字的地址和端口号，然后就向服务器端套接字提出连接请求。<br>tcpSocket-&gt;connectToHost(QHostAddress(ip),port);<br>代码含义：客户端套接字tcpSocket绑定服务器的IP以及端口号，也就是上面服务器监听的端口号。QT中的ConnectHost函数可以为客户端套接字连接服务器套接字</p><p>步骤三：确认连接<br>&emsp;&emsp;服务器端，如果接到客户端的套接字传来的连接信息，会发出newConnection()信号。<br>listen到了，connect(tcpServer,&amp;QTcpServer::newConnection,<a href="">=</a>{qDebug&lt;&lt;“收到客户端的连接信息”});<br>&emsp;&emsp;之后服务器的套接字会向客户端套接字发送已连接信息(也是系统自己操做的，实际是tcpServer生成的tcpSocket发送)，客户端收到该信息后会产生一个connected()信号。<br>connect(tcpSocket, &amp;QTcpSocket::connected,<a href="">=</a>{ui-&gt;textread-&gt;setText(“成功建立连接”);});<br>&emsp;&emsp;连接成功后，tcpServer套接字会获得请求通信的套接字tcpSocket的IP与地址，以备回复信息使用。<br>查看ip与端口的代码：<br>QString ip= tcpSocket-&gt;peerAddress().toString();<br>qint64 port= tcpSocket-&gt;peerPort();</p><p>步骤四： 发送信息<br>&emsp;&emsp;套接字连接成功后，两个套接字之间就仿佛建立了通道，可以相互发送数据了！但需要注意的是：<br>1：信息从通道一端发出就必定会传播到另一端，就好比你打电话一方说一句话声音必然也只能传达到另一方，因此发信息的过程不需要再人为指定对方的IP与端口(通道建立的时候双方套接字内已经指定了对方套接字的IP，端口信息)，你只需要调用tcpSocket-&gt;write(str.toUtf8().data());就可以发消息了。<br>2：tcpServer是监听套接字，也就是说服务器套接字只能监听端口，这就意味着服务器不能收发消息！怎么办呢？再在服务器端创造一个tcpSocket套接字呗。但再创造一个套接字的话就意味着上面的所有和客户端套接字的连接步骤还要重新来一遍，还要创立一条新通道，麻烦！如何用之前我们已经创造的通道给客户端通信呢？QT C++的库中已经给我们写好了按原通道回话的简便方法，依然使用连接好的通路，在服务器端的代码中：<br>tcpSocket = tcpServer-&gt;nextPendingConnection();就是在tcpServer的基础上生成一个tcpSocket。<br>&emsp;&emsp;注意，这个tcpSocket是服务器端的第二个套接字，但与重新实例化一个套接字不同，由于它是在tcpServer的基础上生成一个tcpSocket，它知道通道另一端的客户端套接字的IP与端口，因此可以直接回复信息（客户端的tcpSocket连接服务器的tcpServer，服务器端的TcpServer套接字生成了一个子套接字tcpSocket，由这个子套接字tcpSocket和客户端进行收发消息通信）。</p><p>至此，大功告成，实现了客户端和服务器的双向通信。通完信不要忘了断开客户端连接，关闭套接字<br>我们需要明确的是：1、接受信息的一方不需要发送者的IP与port,发送信息的一方必须要知道对方的IP与port。<br>                2、tcpServer只有监听功能，服务器的收发信息功能是由它生成的tcpSocket负责的。</p><p>客户端cpp代码：</p><pre><code>#include &quot;clientwidget.h&quot;#include &quot;ui_clientwidget.h&quot;#include &lt;QHostAddress&gt;ClientWidget::ClientWidget(QWidget *parent) :    QWidget(parent),    ui(new Ui::ClientWidget)&#123;    ui-&gt;setupUi(this);    tcpSocket = NULL;    tcpSocket = new QTcpSocket(this);    connect(tcpSocket, &amp;QTcpSocket::connected,            [=]()            &#123;                ui-&gt;textread-&gt;setText(&quot;成功建立连接&quot;);            &#125;            );    connect(tcpSocket, &amp;QTcpSocket::readyRead,            [=]()            &#123;                QByteArray array = tcpSocket-&gt;readAll();                ui-&gt;textread-&gt;append(array);            &#125;            );&#125;ClientWidget::~ClientWidget()&#123;    delete ui;&#125;void ClientWidget::on_Buttonconnect_clicked()&#123;    QString ip = ui-&gt;lineEditIP-&gt;text();    qint16 port = ui-&gt;lineEditport-&gt;text().toInt();    tcpSocket-&gt;connectToHost(QHostAddress(ip),port);&#125;void ClientWidget::on_ButtonSend_clicked()&#123;    QString str =ui-&gt;textBwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void ClientWidget::on_ButtonClose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket = NULL;&#125;</code></pre><p>服务器.cpp代码</p><pre><code>#include &quot;widget.h&quot;#include &quot;ui_widget.h&quot;Widget::Widget(QWidget *parent)    : QWidget(parent)    , ui(new Ui::Widget)&#123;    ui-&gt;setupUi(this);    tcpServer = NULL;    tcpSocket = NULL;    tcpServer = new QTcpServer(this);    tcpServer-&gt;listen(QHostAddress::Any,8888);    setWindowTitle(&quot;服务器： 8888&quot;);    connect(tcpServer,&amp;QTcpServer::newConnection,            [=]()            &#123;                tcpSocket = tcpServer-&gt;nextPendingConnection();                QString ip= tcpSocket-&gt;peerAddress().toString();                qint64 port= tcpSocket-&gt;peerPort();                QString temp= QString(&quot;[%1:%2]:成功连接&quot;).arg(ip).arg(port);                ui-&gt;textread-&gt;setText(temp);                connect(tcpSocket, &amp;QTcpSocket::readyRead,                        [=]()                        &#123;                            QByteArray array = tcpSocket-&gt;readAll();                            ui-&gt;textread-&gt;append(array);                        &#125;                        );            &#125;            );&#125;Widget::~Widget()&#123;    delete ui;&#125;void Widget::on_Buttonsend_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    QString str =ui-&gt;textwrite-&gt;toPlainText();    tcpSocket-&gt;write(str.toUtf8().data());&#125;void Widget::on_Buttonclose_clicked()&#123;    if(NULL == tcpSocket)    &#123;        return;    &#125;    tcpSocket-&gt;disconnectFromHost();    tcpSocket-&gt;close();    tcpSocket = NULL;&#125;</code></pre><p>至于Tcp粘包处理，可以在接收函数中修改，详见下面视频。<br><a href="https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1yf4y1Y7CU/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Tcp </tag>
             
         </tags>
       
@@ -204,56 +204,6 @@
     
     
     <entry>
-      <title>开发者日志</title>
-      <link href="/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/"/>
-      <url>/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/</url>
-      
-        <content type="html"><![CDATA[<div class="note default simple"><p>default 开发者日志</p></div><div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴样式</p></div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-21 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases">1.0</a></p></div></div><div class='timeline-item-content'><p>本博客网站开服，作者：yhl2333<br>学校：五道口信息技术学院<br>邮箱：1652966670@qq.com</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;好不容易把bug改完了，把功能实现了。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.6">1.0 -&gt; 1.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月23日，新增了留言新功能，希望大家可以对博客网站提出建设性意见或者有什么想留言的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-25 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月25日，本着精益求精的态度，我对博客进行的大幅度的美化与修缮，成功实现了白天黑夜不同的界面显示与特效。这个过程历时整整一天，出现的问题：修改博客文件后在本地 host:4000端口打开的效果和在浏览器中服务器IP地址打开的效果不同，不同之处在于修改的部分没有显示。进过多次调试查证发现是浏览器自己的数据缓存功能，慨叹自己如此伞兵的同时也对浏览器的搜索引擎的检索能力提出质疑。浏览器的数据缓存：浏览器在加载网页之后会将内容缓存到你的设备上，当你再次访问（包括刷新网页）这个网站就会优先显示上一次加载缓存过的结果，而不是默认立即从服务器上更新全部网站内容，不然1GB的流量打开几个图片量大的网页就都没了。这也就导致了网站的开发者修改过服务器上的资源后刷新网址网址会没有任何变化，望诸位前后端开发者引以为戒！</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-29 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;直接润回家！润的前一晚学校🐏了一个，润的当天🐏了一个。（润的后一天也🐏了一个）（再往后一天和我一层的同学也阳了，一层被拉走隔离了。。）<br>&emsp;&emsp;今天遇到了好多有趣的人，拼车的学姐，开出租的老父亲，做志愿奉献社会的兵哥，每个人都有着我所羡慕并且精彩的生活，<br>&emsp;&emsp;逢人便讲自己的憨厚懂事的高三儿子的出租车父亲，热情的和我讲述自己的孩子如何努力，如何憨厚可爱，如何高三了还孩子气，讲述的时候发自心底的开心与骄傲像极了我的父亲，虽然我不那么懂事（回家发现俺爹真的把烟戒了，挺开心的）。<br>&emsp;&emsp;在拼车群里拼了一天的车都没拼到去北京朝阳站的人，第二天拼到了一个林业大学的研一姐，和我一样也是趁着疫情赶紧润回家，老乡所以在一起聊了还算挺多的吧，值得感叹的是我依然还是和异性交谈九级伤残选手，也不太会表达，但单方面也没感到尴尬，如果不是一面之缘，感觉能成为朋友吧。<br>三四十号转运的人在天寒地冻的大街上冻了一个小时，怨气朝天地上了转运大巴，面对大家的埋怨挖苦，开车的军人哥忍气吞声还疯狂打趣，让车上的气氛缓和了下来，后来知道他是无偿来当志愿者的，理由是想要奉献社会，从早上七点干到晚上十点，很难想象一天中他咽下了多少波分流人员的怨气，令人打心底敬佩，无论如何，给别人多一些容忍与理解吧。<br>&emsp;&emsp;哈西站下了高铁，走在站里有种恍然若失的感觉，感觉愧疚又无力，不知不觉就泪流满面了。高中写了三年的触景生情，好像再今天才算真正的理解了<br>&emsp;&emsp;回家后和杭州的姐姐打了会电话，一切安好，希望今年过年的时候能见到吧<br>&emsp;&emsp;很精彩有趣的一天<br>&emsp;&emsp;三点半了，该睡觉了<br>&emsp;&emsp;晚安，陌生人</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-30 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=100% src="//music.163.com/outchain/player?type=2&id=1907766514&auto=1&height=66"></iframe></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;隔离第二天。已经感觉得到自己精神层面出了些状况，可能是真的有太多太多想找人说说吧，可大家都在忙，也不去打扰了哈哈。<br>&emsp;&emsp;感觉这么多年自己就一直都在念书，大部分还都是无用功。感觉别人的生活都好精彩啊，好想走出去看看啊。引用我彭哥的一句话“没有生活质量慢慢就抑郁了呗”，但比起身边的人我已经算是不错的了。北京看样子要解封了，脸都不要了。<br>提高自己的生活质量，，，，，<br>&emsp;&emsp;好久没更技术篇了，明天更一篇C++出来。<br>&emsp;&emsp;今天属实是没啥正能量了，，<br>&emsp;&emsp;都别跟自己过不去吧，<br>&emsp;&emsp;加油吧大伙</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-3 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;封控第四天，很难想象连续静默几个月的人的精神状态，感觉干什么都失去了兴趣，唯一的好处应该是可以给自己更多的时间思考一些问题。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;开放了评论区，用的必来力评论系统网站，大家可以放心评论不用担心号被盗哈。。。号被盗了我全责好吧</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-9 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;ELDEN RING！年度最佳 2022-12-9</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-26 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;考研结束了，兄弟们都回来了，就算家不在肇东，大家也都第一站回到了肇东。对我来说，可算有人陪着说话打游戏了，不管考得怎么样，都先把一切都放下吧，休养一段时间。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;欢度元旦，给朋友们都发了贺词，鸣谢王哥凌晨帮助我度过情感难关解开心结。希望新一年能够认识到很多志趣相投的人，多交几个朋友。多学一些知识与社会技能，提高自己的生活质量，对自己投资对自己投资对自己投资！新年愿望是让自己变得博学谦逊。女朋友等毕业了再说吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;一根藤2023年度聚首。和大伙一起去了人工湖，看了烟花，打游戏出去住。得知桂花已经找了工作，怎么感觉像是葫芦娃中大娃被妖精抓走了一样，七个人中第一个能早日实现经济自由和生活自由，工作也还不错。被珍惜的快乐才会永远封存在心底，看来大家都别来无恙，即使生活充满了挫折也在努力改变自己的人生，大家加油吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-10 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;第一次和别人微信上唠了五个小时。我自认为挺能唠的，结果遇到了更能唠的，哈哈，好像挺兴趣相投的。每次和陌生的人交谈，真的感觉是在接触另一种经历，人生。真的挺希望和别人多沟通的，感觉自己的智慧也在增长。毕设感觉也就那样了，又想读博了哈哈，但还是未来的生活更重要啊，要不起的牌就要过掉，没啥可说的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-12 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;坚持运动了一个月，跑步和腹肌撕裂者穿插，感觉非常有用，非常有用，非常有用！头脑变得很清晰，感觉回到了头脑巅峰期。肺活量上原来能闭气几十秒，现在轻松两分钟。腹肌也有型了，练了十几次确实成效显著。继续坚持！</p></div></div></div>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 日记 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>新年</title>
-      <link href="/%E6%96%B0%E5%B9%B4/"/>
-      <url>/%E6%96%B0%E5%B9%B4/</url>
-      
-        <content type="html"><![CDATA[<p>要开始新的一年了，过去的一年发生了好多事。</p><p>下了高铁，五味陈杂，不知不觉就泪流满面了。</p><p>生活中有太多的不可抗力了，有太多抓不住的飘渺，有太多心酸和不甘。发现自己活在自己给自己编织的梦里，才被现实一次又一次的打败。</p><p>这些都已经过去了，<br>我觉得真的好可惜，但也只能嘴硬一句仅此而已，别无他法。</p><p>谁都战胜不了生活，但无论生活怎样的光怪陆离与造化弄人，无论怎样无法原谅自己，我都要和生活和解，和自己和解。</p><p>生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，能给生活打分的人也只有自己。</p><p>所以我只觉得可惜，仅此而已。</p><p>不一定会有怎样美好的结局能配得上这一路的颠沛流离。<br>但它一定是能令自己释怀的结局。</p><p>所以我不打算把过去的事情放在心上。<br>一件一件地后悔下去，会没完没了的。<br>我能做的，也只有成为更纯粹的自己。</p><p>又是一年的同学聚会<br>去年的冬天，上一次是在魏老大烧烤，不过当时可以看出，虽然大家都在谈笑风生，但谈到未来，每个人都对未来有些许迷茫和担忧。毕竟面对能决定命运的事件，谁又能坦然以对呢。<br>“一年以后就真的尘埃落定了吧”，我这样和彭哥说。怎样的相互安慰也难掩心中的沉重，因为要面对考研了，要在八比一，十比一的比例中脱颖而出，真的好难呢。在和鸣谈到考研时，发现鸣早已起步，暑假也打算不回来了，在学校备考，对比一下决心，感觉弗如远甚。<br>不知道别人当时在想什么，我当时就在想，“一年以后的现在，大家都会怎样呢”。</p><p>2023 1 4 ，大四的冬天，</p><p>今年的冬天，再次相聚。<br>这次也是看到了大家在一年以后怎么样了，算是给去年的惆怅一个答复。<br>有的考研充满希望，有的找了工作，有的准备二战。但我发现我好像不在意大家有了怎样的结果，我在意的是大家面对考研和找工作的不同的态度。<br>大家都已经有了很明确的规划，准备复试的复试，准备工作搞钱的搞钱，准备二战的也摆脱了心结在重新规划。<br>说实话，我发自内心为我的朋友们感到骄傲，我也从他们身上受到了鼓舞。<br>面对变化莫测的未来，每个人都在用最饱满的一面面对着生活，接受着生活，而不是将自己交给迷茫，随遇而安。</p><p>—生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，自己能释怀就可以了。</p><p>或许这是一根藤最后一次在肇东聚首了吧，谁知道呢<br>就算还能聚，剩下几次了呢。<br>不想去想。<br>我惭愧自己后知后觉，在尾声时才珍惜友情的可贵。<br>从今往后，或许真的天各一方了，或许真的杳无音讯了。<br>如今摆在大家面前的是以后在哪就业，在哪扎根生活的问题。<br>但随着时间推移，这些问题也不算是问题了<br>引用尧的一句话：毕业了以后，三年内，工作，相亲，结婚，买楼，要孩子，基本全都定下来了。<br>是啊，时间的车轮会把一切都辗出痕迹，无论你愿不愿意。<br>五年后，人生就真的定型了吧<br>或许这就是命运吧。<br>七个人，七种不同的命运。<br>无论面临怎样的命运，希望我们在认命的同时，都能看开吧。<br>望着人工湖上的烟花，仿佛心中又燃起了希望，<br>可惜烟花易冷，消散之后黑夜中又只剩下渺小的自己，<br>但希望虽小，却也经常燃起。<br>请对生活充满热情。</p><p><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/47ADA6D4D8E5950AFA63B7F7671FEAF8.png" alt="一根藤高级会议"><br><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/1F8CDA135A8BFF100FA6644CA5AD9089.png" alt="人工湖"></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 日记 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>人们为什么想在大城市定居？</title>
       <link href="/%E5%8C%97%E4%B8%8A%E5%B9%BF%E6%B7%B1/"/>
       <url>/%E5%8C%97%E4%B8%8A%E5%B9%BF%E6%B7%B1/</url>
@@ -304,6 +254,31 @@
     
     
     <entry>
+      <title>开发者日志</title>
+      <link href="/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/"/>
+      <url>/%E5%BC%80%E5%8F%91%E8%80%85%E6%97%A5%E5%BF%97/</url>
+      
+        <content type="html"><![CDATA[<div class="note default simple"><p>default 开发者日志</p></div><div class="timeline blue"><div class='timeline-item headline'><div class='timeline-item-title'><div class='item-circle'><p>时间轴样式</p></div></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-21 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases">1.0</a></p></div></div><div class='timeline-item-content'><p>本博客网站开服，作者：yhl2333<br>学校：五道口信息技术学院<br>邮箱：1652966670@qq.com</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;好不容易把bug改完了，把功能实现了。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-23 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.6">1.0 -&gt; 1.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月23日，新增了留言新功能，希望大家可以对博客网站提出建设性意见或者有什么想留言的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-25 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;今天是11月25日，本着精益求精的态度，我对博客进行的大幅度的美化与修缮，成功实现了白天黑夜不同的界面显示与特效。这个过程历时整整一天，出现的问题：修改博客文件后在本地 host:4000端口打开的效果和在浏览器中服务器IP地址打开的效果不同，不同之处在于修改的部分没有显示。进过多次调试查证发现是浏览器自己的数据缓存功能，慨叹自己如此伞兵的同时也对浏览器的搜索引擎的检索能力提出质疑。浏览器的数据缓存：浏览器在加载网页之后会将内容缓存到你的设备上，当你再次访问（包括刷新网页）这个网站就会优先显示上一次加载缓存过的结果，而不是默认立即从服务器上更新全部网站内容，不然1GB的流量打开几个图片量大的网页就都没了。这也就导致了网站的开发者修改过服务器上的资源后刷新网址网址会没有任何变化，望诸位前后端开发者引以为戒！</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-29 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;直接润回家！润的前一晚学校🐏了一个，润的当天🐏了一个。（润的后一天也🐏了一个）（再往后一天和我一层的同学也阳了，一层被拉走隔离了。。）<br>&emsp;&emsp;今天遇到了好多有趣的人，拼车的学姐，开出租的老父亲，做志愿奉献社会的兵哥，每个人都有着我所羡慕并且精彩的生活，<br>&emsp;&emsp;逢人便讲自己的憨厚懂事的高三儿子的出租车父亲，热情的和我讲述自己的孩子如何努力，如何憨厚可爱，如何高三了还孩子气，讲述的时候发自心底的开心与骄傲像极了我的父亲，虽然我不那么懂事（回家发现俺爹真的把烟戒了，挺开心的）。<br>&emsp;&emsp;在拼车群里拼了一天的车都没拼到去北京朝阳站的人，第二天拼到了一个林业大学的研一姐，和我一样也是趁着疫情赶紧润回家，老乡所以在一起聊了还算挺多的吧，值得感叹的是我依然还是和异性交谈九级伤残选手，也不太会表达，但单方面也没感到尴尬，如果不是一面之缘，感觉能成为朋友吧。<br>三四十号转运的人在天寒地冻的大街上冻了一个小时，怨气朝天地上了转运大巴，面对大家的埋怨挖苦，开车的军人哥忍气吞声还疯狂打趣，让车上的气氛缓和了下来，后来知道他是无偿来当志愿者的，理由是想要奉献社会，从早上七点干到晚上十点，很难想象一天中他咽下了多少波分流人员的怨气，令人打心底敬佩，无论如何，给别人多一些容忍与理解吧。<br>&emsp;&emsp;哈西站下了高铁，走在站里有种恍然若失的感觉，感觉愧疚又无力，不知不觉就泪流满面了。高中写了三年的触景生情，好像再今天才算真正的理解了<br>&emsp;&emsp;回家后和杭州的姐姐打了会电话，一切安好，希望今年过年的时候能见到吧<br>&emsp;&emsp;很精彩有趣的一天<br>&emsp;&emsp;三点半了，该睡觉了<br>&emsp;&emsp;晚安，陌生人</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-11-30 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=100% height=100% src="//music.163.com/outchain/player?type=2&id=1907766514&auto=1&height=66"></iframe></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;隔离第二天。已经感觉得到自己精神层面出了些状况，可能是真的有太多太多想找人说说吧，可大家都在忙，也不去打扰了哈哈。<br>&emsp;&emsp;感觉这么多年自己就一直都在念书，大部分还都是无用功。感觉别人的生活都好精彩啊，好想走出去看看啊。引用我彭哥的一句话“没有生活质量慢慢就抑郁了呗”，但比起身边的人我已经算是不错的了。北京看样子要解封了，脸都不要了。<br>提高自己的生活质量，，，，，<br>&emsp;&emsp;好久没更技术篇了，明天更一篇C++出来。<br>&emsp;&emsp;今天属实是没啥正能量了，，<br>&emsp;&emsp;都别跟自己过不去吧，<br>&emsp;&emsp;加油吧大伙</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-3 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">1.1 -&gt; 2.0</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;封控第四天，很难想象连续静默几个月的人的精神状态，感觉干什么都失去了兴趣，唯一的好处应该是可以给自己更多的时间思考一些问题。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;开放了评论区，用的必来力评论系统网站，大家可以放心评论不用担心号被盗哈。。。号被盗了我全责好吧</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-9 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;ELDEN RING！年度最佳 2022-12-9</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-12-26 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;考研结束了，兄弟们都回来了，就算家不在肇东，大家也都第一站回到了肇东。对我来说，可算有人陪着说话打游戏了，不管考得怎么样，都先把一切都放下吧，休养一段时间。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-1 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;欢度元旦，给朋友们都发了贺词，鸣谢王哥凌晨帮助我度过情感难关解开心结。希望新一年能够认识到很多志趣相投的人，多交几个朋友。多学一些知识与社会技能，提高自己的生活质量，对自己投资对自己投资对自己投资！新年愿望是让自己变得博学谦逊。女朋友等毕业了再说吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2022-1-5 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;一根藤2023年度聚首。和大伙一起去了人工湖，看了烟花，打游戏出去住。得知桂花已经找了工作，怎么感觉像是葫芦娃中大娃被妖精抓走了一样，七个人中第一个能早日实现经济自由和生活自由，工作也还不错。被珍惜的快乐才会永远封存在心底，看来大家都别来无恙，即使生活充满了挫折也在努力改变自己的人生，大家加油吧。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-10 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;第一次和别人微信上唠了五个小时。我自认为挺能唠的，结果遇到了更能唠的，哈哈，好像挺兴趣相投的。每次和陌生的人交谈，真的感觉是在接触另一种经历，人生。真的挺希望和别人多沟通的，感觉自己的智慧也在增长。毕设感觉也就那样了，又想读博了哈哈，但还是未来的生活更重要啊，要不起的牌就要过掉，没啥可说的。</p></div></div><div class='timeline-item'><div class='timeline-item-title'><div class='item-circle'><p>2023-1-12 <a href="https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3">2.0 -&gt; 2.1</a></p></div></div><div class='timeline-item-content'><p>&emsp;&emsp;坚持运动了一个月，跑步和腹肌撕裂者穿插，感觉非常有用，非常有用，非常有用！头脑变得很清晰，感觉回到了头脑巅峰期。肺活量上原来能闭气几十秒，现在轻松两分钟。腹肌也有型了，练了十几次确实成效显著。继续坚持！</p></div></div></div>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 日记 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>为什么毕业生越来越难了?</title>
       <link href="/%E6%AF%95%E4%B8%9A%E5%AD%A3/"/>
       <url>/%E6%AF%95%E4%B8%9A%E5%AD%A3/</url>
@@ -321,6 +296,31 @@
         <tags>
             
             <tag> 就业难 扩招 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>新年</title>
+      <link href="/%E6%96%B0%E5%B9%B4/"/>
+      <url>/%E6%96%B0%E5%B9%B4/</url>
+      
+        <content type="html"><![CDATA[<p>要开始新的一年了，过去的一年发生了好多事。</p><p>下了高铁，五味陈杂，不知不觉就泪流满面了。</p><p>生活中有太多的不可抗力了，有太多抓不住的飘渺，有太多心酸和不甘。发现自己活在自己给自己编织的梦里，才被现实一次又一次的打败。</p><p>这些都已经过去了，<br>我觉得真的好可惜，但也只能嘴硬一句仅此而已，别无他法。</p><p>谁都战胜不了生活，但无论生活怎样的光怪陆离与造化弄人，无论怎样无法原谅自己，我都要和生活和解，和自己和解。</p><p>生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，能给生活打分的人也只有自己。</p><p>所以我只觉得可惜，仅此而已。</p><p>不一定会有怎样美好的结局能配得上这一路的颠沛流离。<br>但它一定是能令自己释怀的结局。</p><p>所以我不打算把过去的事情放在心上。<br>一件一件地后悔下去，会没完没了的。<br>我能做的，也只有成为更纯粹的自己。</p><p>又是一年的同学聚会<br>去年的冬天，上一次是在魏老大烧烤，不过当时可以看出，虽然大家都在谈笑风生，但谈到未来，每个人都对未来有些许迷茫和担忧。毕竟面对能决定命运的事件，谁又能坦然以对呢。<br>“一年以后就真的尘埃落定了吧”，我这样和彭哥说。怎样的相互安慰也难掩心中的沉重，因为要面对考研了，要在八比一，十比一的比例中脱颖而出，真的好难呢。在和鸣谈到考研时，发现鸣早已起步，暑假也打算不回来了，在学校备考，对比一下决心，感觉弗如远甚。<br>不知道别人当时在想什么，我当时就在想，“一年以后的现在，大家都会怎样呢”。</p><p>2023 1 4 ，大四的冬天，</p><p>今年的冬天，再次相聚。<br>这次也是看到了大家在一年以后怎么样了，算是给去年的惆怅一个答复。<br>有的考研充满希望，有的找了工作，有的准备二战。但我发现我好像不在意大家有了怎样的结果，我在意的是大家面对考研和找工作的不同的态度。<br>大家都已经有了很明确的规划，准备复试的复试，准备工作搞钱的搞钱，准备二战的也摆脱了心结在重新规划。<br>说实话，我发自内心为我的朋友们感到骄傲，我也从他们身上受到了鼓舞。<br>面对变化莫测的未来，每个人都在用最饱满的一面面对着生活，接受着生活，而不是将自己交给迷茫，随遇而安。</p><p>—生活是自己创造的，它本身有多大的意义并不重要，比不比得上别人的意义也不重要，自己能释怀就可以了。</p><p>或许这是一根藤最后一次在肇东聚首了吧，谁知道呢<br>就算还能聚，剩下几次了呢。<br>不想去想。<br>我惭愧自己后知后觉，在尾声时才珍惜友情的可贵。<br>从今往后，或许真的天各一方了，或许真的杳无音讯了。<br>如今摆在大家面前的是以后在哪就业，在哪扎根生活的问题。<br>但随着时间推移，这些问题也不算是问题了<br>引用尧的一句话：毕业了以后，三年内，工作，相亲，结婚，买楼，要孩子，基本全都定下来了。<br>是啊，时间的车轮会把一切都辗出痕迹，无论你愿不愿意。<br>五年后，人生就真的定型了吧<br>或许这就是命运吧。<br>七个人，七种不同的命运。<br>无论面临怎样的命运，希望我们在认命的同时，都能看开吧。<br>望着人工湖上的烟花，仿佛心中又燃起了希望，<br>可惜烟花易冷，消散之后黑夜中又只剩下渺小的自己，<br>但希望虽小，却也经常燃起。<br>请对生活充满热情。</p><p><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/47ADA6D4D8E5950AFA63B7F7671FEAF8.png" alt="一根藤高级会议"><br><img src="https://blog-1315294080.cos.ap-beijing.myqcloud.com/1F8CDA135A8BFF100FA6644CA5AD9089.png" alt="人工湖"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 日记 </tag>
             
         </tags>
       
@@ -354,36 +354,11 @@
     
     
     <entry>
-      <title>博客设计初衷</title>
-      <link href="/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/"/>
-      <url>/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/</url>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/QTwidget/"/>
+      <url>/QTwidget/</url>
       
-        <content type="html"><![CDATA[<p>、<br>&emsp;&emsp;今天是2022年11月21日，也是本人在博客网站几乎完成了所有的基础构建，开服的第一天。关于我为什么要创建博客，大概是想从自己的世界进入到外面的世界吧，感觉过去的自己烂透了，因此我想充分的利用闲暇时间提升一下个人能力与素养，相当于写写日记，记录一下平时的所看所学所想，整理我在研究生生涯的学习思路与内容。在这个经济低迷，硕士博士遍地而无offer的时代，广泛的涉猎，融会贯通变得越来越重要。这是一个靠能力而非学历的时代，也是一个疯狂内卷内耗的时代，希望各位都能乐观豁达地面对苦难，没有什么过不去的坎，但也别和自己过不去，对自己温柔一点，加油！</p><p>&emsp;&emsp;我呢，就是个普通人，因此我想将自己的学习，生活中的历程与踩过的坑分享给大家，帮助同样是想要学习一些热门知识并且想要交流沟通的人。相信已经学四年的你一定知道能否得到帮助的重要性，在本网站中，我会先将学习的内容分成以下几个我目前在学的大类，在这些类中我会分享我在学习中所看过的好的视频，通俗易懂的CSDN，知乎，简书以及我个人的梳理与理解。目前几个大类应该是：C++编程（QT），机器学习强化学习，计网与操作系统，硬软件茶谈（比如软硬件，服务器的使用手册等常识性知识）。</p><p>&emsp;&emsp;搭建整个博客耗费了两天时间，保研以后空出的时间多了起来，我也在广泛学习一些网络技术以及编程技术，博客就是主要开发的项目之一，我也推荐大家记录一些生活中的故事，在现如今如此快节奏且无意义的生活中给自己留一点空间，反思提升自己显得格外珍贵，更新周期的话每周一更吧，一到两篇，总之大伙加油吧。</p><p>&emsp;&emsp;给大家推荐一首室友黄某推荐的歌：<a href="https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 杂谈 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 个人 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>C++笔记</title>
-      <link href="/C-%E8%B8%A9%E5%9D%91/"/>
-      <url>/C-%E8%B8%A9%E5%9D%91/</url>
-      
-        <content type="html"><![CDATA[<!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于常量指针与指针常量</p><pre><code>const int *p=&amp;a ; </code></pre><p>const 修饰的是取 <em>的操作，因此取星操作不能改变，就是 </em>p的值(p所指的内容)不可改变 ，但指针的方向可以改变。<br><img src="/img/5.png" alt="">  </p><pre><code>int * const p = &amp;a ; </code></pre><p>const修饰的是p这个指针，因此这个指针的指向固定了，但是指针所指的内容可以改变。<br><img src="/img/4.png" alt=""><br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于栈空间返回值用指针与别名接收</p><pre><code>int test01()&#123;    int a=10;    return a;&#125;int main()&#123;    int &amp;ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255</p><p>原因，拿别名指向返回值，但test01()执行完后，该返回值所在空间被释放了，编译器会默认保留返回值一次。<br>同理：<br>    int test01()<br>    {<br>        int a=10;<br>        return &amp;a ;<br>    }</p><pre><code>int main()&#123;    int *ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255<br>也是一个原因。其本质都是指针指向了一个被释放的栈空间而编译器只保留了一次。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>.h文件中定义的变量， .cpp中的所有函数都可以使用,并且相当于在.cpp中定义的静态变量，只要类运行不结束，变量就不会被释放。但在构造函数中定义的变量，无法在.cpp文件中除构造函数的其他函数中使用，因为构造函数相当于一个函数，执行完构造函数就被释放掉了，需要注意的是执行完构造函数后，该class不一定会结束。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>QString buf =”123”;<br>如何将QString转化为QByteArray？QByteArray a = buf.toUtf8();这里的QByteArray是由UTF-8编码，为了对应中文问题，也可选择其他编码，依然属于QByteArray类型。<br>如何再将得到的QByteArray 类型的a转化为 char<em> 类型（即c++的string,buf为QT的string）呢？: char</em>b=a.data();<br>如何再将得到的QByteArray 类型的a转化为 QString 类型？：QString（a）<br>如何将char<em> 转化为QString呢？QString c = QString(b);<br>这样三种类型形成了闭环。<br>qDebug()&lt;&lt;;指定的是char</em>类型。<br><!-- endtimeline --><br>引用和指针区别<br>指针和引用主要有以下区别：</p><p>引用必须被初始化，但是不分配存储空间。指针不声明时初始化，在初始化的时候需要分配存储空间。<br>引用初始化后不能被改变，指针可以改变所指的对象。<br>不存在指向空值的引用，但是存在指向空值的指针。<br>注意：引用作为函数参数时，会引发一定的问题，因为让引用作参数，目的就是想改变这个引用所指向地址的内容，而函数调用时传入的是实参，看不出函数的参数是正常变量，还是引用，因此可能引发错误。所以使用时一定要小心谨慎。</p><p>从概念上讲。指针从本质上讲就是存放变量地址的一个变量，在逻辑上是独立的，它可以被改变，包括其所指向的地址的改变和其指向的地址中所存放的数据的改变。</p><p>而引用是一个别名，它在逻辑上不是独立的，它的存在具有依附性，所以引用必须在一开始就被初始化，而且其引用的对象在其整个生命周期中是不能被改变的（自始至终只能依附于同一个变量）。</p><p>在C++中，指针和引用经常用于函数的参数传递，然而，指针传递参数和引用传递参数是有本质上的不同的：</p><p>指针传递参数本质上是 值传递的方式，它所传递的是一个地址值。值传递过程中，被调函数的形式参数作为被调函数的局部变量处理，即在栈中开辟了内存空间以存放由主调函数放进来的 实参的值，从而成为了实参的一个副本。值传递的特点是被调函数对形式参数的任何操作都是作为局部变量进行，不会影响主调函数的实参变量的值。<br>而在引用传递过程中， 被调函数的形式参数虽然也作为局部变量在栈中开辟了内存空间，但是这时存放的是由主调函数放进来的实参变量的地址。被调函数对形参的任何操作都被处理成间 接寻址，即通过栈中存放的地址访问主调函数中的实参变量。正因为如此，被调函数对形参做的任何操作都影响了主调函数中的实参变量。<br>引用传递和指针传递是 不同的，虽然它们都是在被调函数栈空间上的一个局部变量，但是任何对于引用参数的处理都会通过一个间接寻址的方式操作到主调函数中的相关变量。而对于指针 传递的参数，如果改变被调函数中的指针地址，它将影响不到主调函数的相关变量。如果想通过指针参数传递来改变主调函数中的相关变量，那就得使用指向指针的 指针，或者指针引用。<br>为了进一步加深大家对指针和引用的区别，下面我从编译的角度来阐述它们之间的区别：</p><p>程序在编译时分别将指 针和引用添加到符号表上，符号表上记录的是变量名及变量所对应地址。指针变量在符号表上对应的地址值为指针变量的地址值，而引用在符号表上对应的地址值为 引用对象的地址值。符号表生成后就不会再改，因此指针可以改变其指向的对象（指针变量中的值可以改），而引用对象则不能修改。</p><p>最后，总结一下指针和引用的相同点和不同点：</p><p>★相同点：</p><p>●都是地址的概念；</p><p>指针指向一块内存，它的内容是所指内存的地址；而引用则是某块内存的别名。</p><p>★不同点：</p><p>●指针是一个实体，而引用仅是个别名；</p><p>●引用只能在定义时被初始化一次，之后不可变；指针可变；引用“从一而终”，指针可以“见异思迁”；</p><p>●引用没有const，指针有const，const的指针不可变；</p><p>●引用不能为空，指针可以为空；</p><p>●“sizeof 引用”得到的是所指向的变量(对象)的大小，而“sizeof 指针”得到的是指针本身的大小；</p><p>●指针和引用的自增(++)运算意义不一样；</p><p>●引用是类型安全的，而指针不是 (引用比指针多了类型检查）<br><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --></p><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline -->]]></content>
+        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
       
       
       <categories>
@@ -392,12 +367,6 @@
           
       </categories>
       
-      
-        <tags>
-            
-            <tag> 指针，踩坑 </tag>
-            
-        </tags>
       
     </entry>
     
@@ -429,11 +398,11 @@
     
     
     <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/QTwidget/"/>
-      <url>/QTwidget/</url>
+      <title>QT如何连接mysql</title>
+      <link href="/database/"/>
+      <url>/database/</url>
       
-        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
+        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>show databases;<br>看到数据库里的存储区<br>use info<br>进入其中的一个存储区<br>show tables;<br>可以看到区里具体的表<br>select * from 表名<br>可以看到表里有啥</p><p>tips:<br>    QString sql1 = QString(“create table %1(id double,x double,y double,h double,v double,t double)”).arg(a);<br>这样可以实现动态设置表名，例如如果需要把每个for循环采集到的数据做成一个表，那么就可以这样动态设置表名<br>表名必须是字母！<br>也可以用函数获取当前的绝对时间，arg(时间)，来实现动态设置表名</p>]]></content>
       
       
       <categories>
@@ -443,16 +412,22 @@
       </categories>
       
       
+        <tags>
+            
+            <tag> 指针，踩坑 </tag>
+            
+        </tags>
+      
     </entry>
     
     
     
     <entry>
-      <title>QT如何连接mysql</title>
-      <link href="/database/"/>
-      <url>/database/</url>
+      <title>C++笔记</title>
+      <link href="/C-%E8%B8%A9%E5%9D%91/"/>
+      <url>/C-%E8%B8%A9%E5%9D%91/</url>
       
-        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>show databases;<br>看到数据库里的存储区<br>use info<br>进入其中的一个存储区<br>show tables;<br>可以看到区里具体的表<br>select * from 表名<br>可以看到表里有啥</p><p>tips:<br>    QString sql1 = QString(“create table %1(id double,x double,y double,h double,v double,t double)”).arg(a);<br>这样可以实现动态设置表名，例如如果需要把每个for循环采集到的数据做成一个表，那么就可以这样动态设置表名<br>表名必须是字母！<br>也可以用函数获取当前的绝对时间，arg(时间)，来实现动态设置表名</p>]]></content>
+        <content type="html"><![CDATA[<!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于常量指针与指针常量</p><pre><code>const int *p=&amp;a ; </code></pre><p>const 修饰的是取 <em>的操作，因此取星操作不能改变，就是 </em>p的值(p所指的内容)不可改变 ，但指针的方向可以改变。<br><img src="/img/5.png" alt="">  </p><pre><code>int * const p = &amp;a ; </code></pre><p>const修饰的是p这个指针，因此这个指针的指向固定了，但是指针所指的内容可以改变。<br><img src="/img/4.png" alt=""><br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>关于栈空间返回值用指针与别名接收</p><pre><code>int test01()&#123;    int a=10;    return a;&#125;int main()&#123;    int &amp;ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255</p><p>原因，拿别名指向返回值，但test01()执行完后，该返回值所在空间被释放了，编译器会默认保留返回值一次。<br>同理：<br>    int test01()<br>    {<br>        int a=10;<br>        return &amp;a ;<br>    }</p><pre><code>int main()&#123;    int *ref = test01();    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;    cout&lt;&lt;&quot;ref = &quot;&lt;&lt; *ref &lt;&lt; endl;&#125;</code></pre><p>输出结果： ref = 10<br>          ref = 2425255<br>也是一个原因。其本质都是指针指向了一个被释放的栈空间而编译器只保留了一次。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>.h文件中定义的变量， .cpp中的所有函数都可以使用,并且相当于在.cpp中定义的静态变量，只要类运行不结束，变量就不会被释放。但在构造函数中定义的变量，无法在.cpp文件中除构造函数的其他函数中使用，因为构造函数相当于一个函数，执行完构造函数就被释放掉了，需要注意的是执行完构造函数后，该class不一定会结束。<br><!-- endtimeline --></p><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>QString buf =”123”;<br>如何将QString转化为QByteArray？QByteArray a = buf.toUtf8();这里的QByteArray是由UTF-8编码，为了对应中文问题，也可选择其他编码，依然属于QByteArray类型。<br>如何再将得到的QByteArray 类型的a转化为 char<em> 类型（即c++的string,buf为QT的string）呢？: char</em>b=a.data();<br>如何再将得到的QByteArray 类型的a转化为 QString 类型？：QString（a）<br>如何将char<em> 转化为QString呢？QString c = QString(b);<br>这样三种类型形成了闭环。<br>qDebug()&lt;&lt;;指定的是char</em>类型。<br><!-- endtimeline --><br>引用和指针区别<br>指针和引用主要有以下区别：</p><p>引用必须被初始化，但是不分配存储空间。指针不声明时初始化，在初始化的时候需要分配存储空间。<br>引用初始化后不能被改变，指针可以改变所指的对象。<br>不存在指向空值的引用，但是存在指向空值的指针。<br>注意：引用作为函数参数时，会引发一定的问题，因为让引用作参数，目的就是想改变这个引用所指向地址的内容，而函数调用时传入的是实参，看不出函数的参数是正常变量，还是引用，因此可能引发错误。所以使用时一定要小心谨慎。</p><p>从概念上讲。指针从本质上讲就是存放变量地址的一个变量，在逻辑上是独立的，它可以被改变，包括其所指向的地址的改变和其指向的地址中所存放的数据的改变。</p><p>而引用是一个别名，它在逻辑上不是独立的，它的存在具有依附性，所以引用必须在一开始就被初始化，而且其引用的对象在其整个生命周期中是不能被改变的（自始至终只能依附于同一个变量）。</p><p>在C++中，指针和引用经常用于函数的参数传递，然而，指针传递参数和引用传递参数是有本质上的不同的：</p><p>指针传递参数本质上是 值传递的方式，它所传递的是一个地址值。值传递过程中，被调函数的形式参数作为被调函数的局部变量处理，即在栈中开辟了内存空间以存放由主调函数放进来的 实参的值，从而成为了实参的一个副本。值传递的特点是被调函数对形式参数的任何操作都是作为局部变量进行，不会影响主调函数的实参变量的值。<br>而在引用传递过程中， 被调函数的形式参数虽然也作为局部变量在栈中开辟了内存空间，但是这时存放的是由主调函数放进来的实参变量的地址。被调函数对形参的任何操作都被处理成间 接寻址，即通过栈中存放的地址访问主调函数中的实参变量。正因为如此，被调函数对形参做的任何操作都影响了主调函数中的实参变量。<br>引用传递和指针传递是 不同的，虽然它们都是在被调函数栈空间上的一个局部变量，但是任何对于引用参数的处理都会通过一个间接寻址的方式操作到主调函数中的相关变量。而对于指针 传递的参数，如果改变被调函数中的指针地址，它将影响不到主调函数的相关变量。如果想通过指针参数传递来改变主调函数中的相关变量，那就得使用指向指针的 指针，或者指针引用。<br>为了进一步加深大家对指针和引用的区别，下面我从编译的角度来阐述它们之间的区别：</p><p>程序在编译时分别将指 针和引用添加到符号表上，符号表上记录的是变量名及变量所对应地址。指针变量在符号表上对应的地址值为指针变量的地址值，而引用在符号表上对应的地址值为 引用对象的地址值。符号表生成后就不会再改，因此指针可以改变其指向的对象（指针变量中的值可以改），而引用对象则不能修改。</p><p>最后，总结一下指针和引用的相同点和不同点：</p><p>★相同点：</p><p>●都是地址的概念；</p><p>指针指向一块内存，它的内容是所指内存的地址；而引用则是某块内存的别名。</p><p>★不同点：</p><p>●指针是一个实体，而引用仅是个别名；</p><p>●引用只能在定义时被初始化一次，之后不可变；指针可变；引用“从一而终”，指针可以“见异思迁”；</p><p>●引用没有const，指针有const，const的指针不可变；</p><p>●引用不能为空，指针可以为空；</p><p>●“sizeof 引用”得到的是所指向的变量(对象)的大小，而“sizeof 指针”得到的是指针本身的大小；</p><p>●指针和引用的自增(++)运算意义不一样；</p><p>●引用是类型安全的，而指针不是 (引用比指针多了类型检查）<br><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --></p><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline --><!-- timeline 2022-12-5 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><!-- endtimeline -->]]></content>
       
       
       <categories>
@@ -498,6 +473,31 @@
     
     
     <entry>
+      <title>测试文章</title>
+      <link href="/test/"/>
+      <url>/test/</url>
+      
+        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 个人 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>操作系统的发展简史</title>
       <link href="/x86/"/>
       <url>/x86/</url>
@@ -523,11 +523,11 @@
     
     
     <entry>
-      <title>测试文章</title>
-      <link href="/test/"/>
-      <url>/test/</url>
+      <title>博客设计初衷</title>
+      <link href="/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/"/>
+      <url>/%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%88%9B%E7%AB%8B%E5%8D%9A%E5%AE%A2/</url>
       
-        <content type="html"><![CDATA[<p>建博客来第一篇文章<br><img src="/img/19.png" alt=""><br>点击下方链接即可进入学习：<br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">写博文学习b站网址</a><br><a href="https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1WW411F7Ss/?spm_id_from=333.788.recommend_more_video.6&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+        <content type="html"><![CDATA[<p>、<br>&emsp;&emsp;今天是2022年11月21日，也是本人在博客网站几乎完成了所有的基础构建，开服的第一天。关于我为什么要创建博客，大概是想从自己的世界进入到外面的世界吧，感觉过去的自己烂透了，因此我想充分的利用闲暇时间提升一下个人能力与素养，相当于写写日记，记录一下平时的所看所学所想，整理我在研究生生涯的学习思路与内容。在这个经济低迷，硕士博士遍地而无offer的时代，广泛的涉猎，融会贯通变得越来越重要。这是一个靠能力而非学历的时代，也是一个疯狂内卷内耗的时代，希望各位都能乐观豁达地面对苦难，没有什么过不去的坎，但也别和自己过不去，对自己温柔一点，加油！</p><p>&emsp;&emsp;我呢，就是个普通人，因此我想将自己的学习，生活中的历程与踩过的坑分享给大家，帮助同样是想要学习一些热门知识并且想要交流沟通的人。相信已经学四年的你一定知道能否得到帮助的重要性，在本网站中，我会先将学习的内容分成以下几个我目前在学的大类，在这些类中我会分享我在学习中所看过的好的视频，通俗易懂的CSDN，知乎，简书以及我个人的梳理与理解。目前几个大类应该是：C++编程（QT），机器学习强化学习，计网与操作系统，硬软件茶谈（比如软硬件，服务器的使用手册等常识性知识）。</p><p>&emsp;&emsp;搭建整个博客耗费了两天时间，保研以后空出的时间多了起来，我也在广泛学习一些网络技术以及编程技术，博客就是主要开发的项目之一，我也推荐大家记录一些生活中的故事，在现如今如此快节奏且无意义的生活中给自己留一点空间，反思提升自己显得格外珍贵，更新周期的话每周一更吧，一到两篇，总之大伙加油吧。</p><p>&emsp;&emsp;给大家推荐一首室友黄某推荐的歌：<a href="https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1ZL4y1H7Mz/?spm_id_from=333.337.search-card.all.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
       
       
       <categories>
