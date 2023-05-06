@@ -212,7 +212,7 @@ div#archive {
   color: #ffffff;
 }
 
-/* 个人信息卡片背景图 */
+个人信息卡片背景图
 [data-theme="light"] #aside-content > .card-widget.card-info {
   background-image: url(https://blog-1315294080.cos.ap-beijing.myqcloud.com/winter.png);
   background-repeat: no-repeat;
