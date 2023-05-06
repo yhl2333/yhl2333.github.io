@@ -79,31 +79,6 @@
     
     
     <entry>
-      <title>QT中的UDP，UDP与TCP比较</title>
-      <link href="/UDP/"/>
-      <url>/UDP/</url>
-      
-        <content type="html"><![CDATA[<p><img src="/img/UDP.png" alt="UDP原理"><br>步骤：<br>&emsp;&emsp;1：实例化两个套接字(服务器和客户端的套接字都一样，不用再向TCP一样分serveSocket,TcpSocket)<br>&emsp;&emsp;2：接收方bind() 自己的端口port，IP<br>&emsp;&emsp;3：收发<br>&emsp;&emsp;4：关闭套接字。</p><p>UDP与TCP区别：<br>&emsp;&emsp;UDP通信过程中，每次都需要指定数据接收端的IP和端口，和发快递差不多，每次发都要填地址；<br>TCP则三次握手建立通道后每次发送就不必指定端口和IP了，在通道中就发送了。;和打电话一样，电话一旦接通就随便唠了。<br>UDP：udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);<br>TCP：tcpSocket-&gt;write(str.toUtf8().data())<br>从两者的发送可以看出UDP每次发送都要填IP与Port，TCP建立完通道后就不用管了。</p><p>&emsp;&emsp;UDP通信不需要建立连接，因此不需要进行 connect() 操作。TCP则又是newconnection 又是connected来确保连接畅通。</p><p>&emsp;&emsp;TCP是以字节流的形式传输数据，因此会出现粘包现象，UDP则以数据包的形式传输。</p><p>&emsp;&emsp;使用UDP进行通信，服务器和客户端的处理步骤比TCP要简单很多，并且两端是对等的(通信的处理流程几乎是一样的)，也就是说并没有严格意义上的客户端和服务器端。但哪一端是接收数据的角色，那么这个接收端就必须绑定（bind）一个固定的端口，因为起码得告诉发数据的人往哪里发吧。如果某一端不需要接收数据，这个绑定操作就可以省略不写了，通信的套接字会自动绑定一个随机端口，并且随着数据发送过去，在接收端recv()函数中会解析出发送者的IP与Port，这样接收者也能给发送者回话了！这点和TCP差不多。不过这种只绑定一端的做法的代价是，绑定方无法给未绑定方发消息，因为绑定方是不知道未绑定方的IP与Port的（未绑定系统随机非配发送端口），也就是说第一次发送的方向是固定的！这点和TCP一样，用TCP协议也基本上默认了第一次发送方向固定这一条件。怎么实现向QQ一样两边谁先发都可以的通信呢？两边都bind()就可以了啊！这样两边的发送地址都固定了，都知道对方的IP，port的情况下，谁先发都可以。</p><p>&emsp;&emsp;TCP是一定会完整，准确的发送数据的，粘包可以自己解决！UDP不对收到的数据进行排序，在UDP报文的首部中并没有关于数据顺序的信息，UDP对接收到的数据报不回复确认信息，发送端不知道数据是否被正确接收，也不会重发数据。如果发生了数据丢失，不存在丢一半的情况，如果丢当前这个数据包就全部丢失了。因此，UDP简单，随意的代价就是可能会数据丢失。</p><p>附上UDP.cpp代码，客户端和服务器共用一个代码，都bind()了：</p><pre><code>#include &quot;client.h&quot;#include &quot;ui_client.h&quot;#include &lt;QHostAddress&gt;client::client(QWidget *parent) :    QWidget(parent),    ui(new Ui::client)&#123;    ui-&gt;setupUi(this);    udpSocket = new QUdpSocket(this);    udpSocket-&gt;bind(8887);    setWindowTitle(&quot;端口8887&quot;);    connect(udpSocket,&amp;QUdpSocket::readyRead,this,&amp;client::dealMsg);&#125;client::~client()&#123;    delete ui;&#125;void client::dealMsg()&#123;    char buf[ 1024 ]=&#123;0&#125;;    QHostAddress cliAddr;    quint16 port;    qint64 len =udpSocket-&gt;readDatagram(buf, sizeof(buf),&amp;cliAddr, &amp;port);    if(len&gt;0)    &#123;        QString str = QString(&quot;&#123;%1:%2&#125; %3&quot;)                .arg(cliAddr.toString())                .arg(port)                .arg(buf);        ui-&gt;textEdit-&gt;setText(str);    &#125;&#125;void client::on_Buttonsend_clicked()&#123;    QString ip = ui-&gt;lineIP-&gt;text();    qint16 port = ui-&gt;lineport-&gt;text().toInt();    QString str =ui-&gt;textEdit-&gt;toPlainText();    udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);&#125;</code></pre>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> UDP TCP </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>关于C++ QT中的Tcp</title>
       <link href="/Tcp/"/>
       <url>/Tcp/</url>
@@ -121,6 +96,31 @@
         <tags>
             
             <tag> Tcp </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>QT中的UDP，UDP与TCP比较</title>
+      <link href="/UDP/"/>
+      <url>/UDP/</url>
+      
+        <content type="html"><![CDATA[<p><img src="/img/UDP.png" alt="UDP原理"><br>步骤：<br>&emsp;&emsp;1：实例化两个套接字(服务器和客户端的套接字都一样，不用再向TCP一样分serveSocket,TcpSocket)<br>&emsp;&emsp;2：接收方bind() 自己的端口port，IP<br>&emsp;&emsp;3：收发<br>&emsp;&emsp;4：关闭套接字。</p><p>UDP与TCP区别：<br>&emsp;&emsp;UDP通信过程中，每次都需要指定数据接收端的IP和端口，和发快递差不多，每次发都要填地址；<br>TCP则三次握手建立通道后每次发送就不必指定端口和IP了，在通道中就发送了。;和打电话一样，电话一旦接通就随便唠了。<br>UDP：udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);<br>TCP：tcpSocket-&gt;write(str.toUtf8().data())<br>从两者的发送可以看出UDP每次发送都要填IP与Port，TCP建立完通道后就不用管了。</p><p>&emsp;&emsp;UDP通信不需要建立连接，因此不需要进行 connect() 操作。TCP则又是newconnection 又是connected来确保连接畅通。</p><p>&emsp;&emsp;TCP是以字节流的形式传输数据，因此会出现粘包现象，UDP则以数据包的形式传输。</p><p>&emsp;&emsp;使用UDP进行通信，服务器和客户端的处理步骤比TCP要简单很多，并且两端是对等的(通信的处理流程几乎是一样的)，也就是说并没有严格意义上的客户端和服务器端。但哪一端是接收数据的角色，那么这个接收端就必须绑定（bind）一个固定的端口，因为起码得告诉发数据的人往哪里发吧。如果某一端不需要接收数据，这个绑定操作就可以省略不写了，通信的套接字会自动绑定一个随机端口，并且随着数据发送过去，在接收端recv()函数中会解析出发送者的IP与Port，这样接收者也能给发送者回话了！这点和TCP差不多。不过这种只绑定一端的做法的代价是，绑定方无法给未绑定方发消息，因为绑定方是不知道未绑定方的IP与Port的（未绑定系统随机非配发送端口），也就是说第一次发送的方向是固定的！这点和TCP一样，用TCP协议也基本上默认了第一次发送方向固定这一条件。怎么实现向QQ一样两边谁先发都可以的通信呢？两边都bind()就可以了啊！这样两边的发送地址都固定了，都知道对方的IP，port的情况下，谁先发都可以。</p><p>&emsp;&emsp;TCP是一定会完整，准确的发送数据的，粘包可以自己解决！UDP不对收到的数据进行排序，在UDP报文的首部中并没有关于数据顺序的信息，UDP对接收到的数据报不回复确认信息，发送端不知道数据是否被正确接收，也不会重发数据。如果发生了数据丢失，不存在丢一半的情况，如果丢当前这个数据包就全部丢失了。因此，UDP简单，随意的代价就是可能会数据丢失。</p><p>附上UDP.cpp代码，客户端和服务器共用一个代码，都bind()了：</p><pre><code>#include &quot;client.h&quot;#include &quot;ui_client.h&quot;#include &lt;QHostAddress&gt;client::client(QWidget *parent) :    QWidget(parent),    ui(new Ui::client)&#123;    ui-&gt;setupUi(this);    udpSocket = new QUdpSocket(this);    udpSocket-&gt;bind(8887);    setWindowTitle(&quot;端口8887&quot;);    connect(udpSocket,&amp;QUdpSocket::readyRead,this,&amp;client::dealMsg);&#125;client::~client()&#123;    delete ui;&#125;void client::dealMsg()&#123;    char buf[ 1024 ]=&#123;0&#125;;    QHostAddress cliAddr;    quint16 port;    qint64 len =udpSocket-&gt;readDatagram(buf, sizeof(buf),&amp;cliAddr, &amp;port);    if(len&gt;0)    &#123;        QString str = QString(&quot;&#123;%1:%2&#125; %3&quot;)                .arg(cliAddr.toString())                .arg(port)                .arg(buf);        ui-&gt;textEdit-&gt;setText(str);    &#125;&#125;void client::on_Buttonsend_clicked()&#123;    QString ip = ui-&gt;lineIP-&gt;text();    qint16 port = ui-&gt;lineport-&gt;text().toInt();    QString str =ui-&gt;textEdit-&gt;toPlainText();    udpSocket-&gt;writeDatagram(str.toUtf8(),QHostAddress(ip),port);&#125;</code></pre>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> UDP TCP </tag>
             
         </tags>
       
@@ -404,25 +404,6 @@
     
     
     <entry>
-      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
-      <link href="/QTwidget/"/>
-      <url>/QTwidget/</url>
-      
-        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>C++笔记</title>
       <link href="/C-%E8%B8%A9%E5%9D%91/"/>
       <url>/C-%E8%B8%A9%E5%9D%91/</url>
@@ -448,11 +429,11 @@
     
     
     <entry>
-      <title>QT如何连接mysql</title>
-      <link href="/database/"/>
-      <url>/database/</url>
+      <title>关于C++ QT中的 Widget::Widget(QWidget *parent) :QWidget(parent)</title>
+      <link href="/QTwidget/"/>
+      <url>/QTwidget/</url>
       
-        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>show databases;<br>看到数据库里的存储区<br>use info<br>进入其中的一个存储区<br>show tables;<br>可以看到区里具体的表<br>select * from 表名<br>可以看到表里有啥</p><p>tips:<br>    QString sql1 = QString(“create table %1(id double,x double,y double,h double,v double,t double)”).arg(a);<br>这样可以实现动态设置表名，例如如果需要把每个for循环采集到的数据做成一个表，那么就可以这样动态设置表名<br>表名必须是字母！<br>也可以用函数获取当前的绝对时间，arg(时间)，来实现动态设置表名</p>]]></content>
+        <content type="html"><![CDATA[<p>如何理解下面段代码?</p><pre><code>Widget::Widget(QWidget *parent) :    QWidget(parent)&#123;&#125;</code></pre><p>在讲解原因之前，先请大家看下面的一个例子:</p><pre><code>#include &lt;iostream&gt;using namespace std;class Base&#123;public:    Base() :m_num(0)&#123;        cout &lt;&lt; &quot;this is Base()&quot; &lt;&lt; endl;    &#125;    Base(int val):m_num(val)&#123;        cout &lt;&lt; &quot;this is Base(int val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p> 上方代码定义了一个基类Base，并且有两个构造函数，一个是默认构造函数，一个是有一个整型参数的构造函数。</p><pre><code>class BaseChild: public Base&#123;public:    BaseChild()&#123;        cout &lt;&lt; &quot;this is BaseChild()&quot; &lt;&lt; endl;    &#125;    BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;private:    int m_num;&#125;;</code></pre><p>上方代码定义了一个BaseChild类，并继承Base类，同样的，它也定义了两个构造函数，一个默认，一个有整型参数。</p><pre><code>int main(int argc, char *argv[])&#123;    BaseChild child1;    BaseChild child2(5);    return 0;&#125;</code></pre><p>main函数实例化了两个子类实例，child1，child2。child1调用默认构造函数。child2调用有整型参数的构造函数。<br>现在，我们运行程序，会有如下打印：<br><img src="/img/1.png" alt=""><br>看到了吗，我们发现：<br> ·创建child1时，是先调用了Base的默认构造函数，再调用自己的默认构造函数<br> ·创建child2时，是先调用了Base(int)这个构造函数，再调用自己的整型参数构造函数。</p><p>所以我们回头看BaseChild的构造函数:</p><pre><code>BaseChild(int val): Base(val)&#123;        cout &lt;&lt; &quot;this is BaseChild(val)&quot; &lt;&lt; endl;    &#125;</code></pre><p>细心的同学，可能早就发现了，初始化列表中的Base(val)正是调用了我们Base基类的有参构造函数，而这样的写法就刚好是我们开头代码中的那段:<br>Widget::Widget(QWidget <em>parent) :QWidget(parent)<br>所以Widget是调用了QWidget下面的构造函数:<br>QWidget(QWidget</em> parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());<br>所以得出如下总结：<br>总结：<br>· 如果不指定构造函数，则派生类会调用基类的默认构造函数<br>· 派生类构造函数的初始化列表只能初始化派生类成员，不能直接初始化继承成员，如果想 要调用基类的有参构造函数，则可以在派生类的初始化列表中显示指定</p><p>以上总结，也告诉我们，当定义一个类时，最好为该类定义默认构造函数。<br>好的，那么我们又提出一个问题，“调用QWidget(parent)这个构造函数，QWidget父类都做了哪些动作呢？”<br>下面是QWidget源码中的一部分节选：</p><pre><code>QWidget::QWidget( QWidget *parent, const char *name, WFlags f )    : QObject( parent, name ), QPaintDevice( PDT_WIDGET ),    pal( parent ? parent-&gt;palette()        // use parent&#39;s palette        : *qApp-&gt;palette() )            // use application palette&#123;    if ( parent ) &#123;    QChildEvent *e = new QChildEvent( Event_ChildInserted, this );    QApplication::postEvent( parent, e );    &#125;&#125;</code></pre><p>大家从上面可以看出，如果parent参数非空的话，那么该构造函数使用了其父窗口的调色板，并且发送了QChildEvent事件，这会让新的窗口成为parent所指窗口的子窗口，那么当父窗口被删除时，子窗口也会自动的被删除。</p>]]></content>
       
       
       <categories>
@@ -461,12 +442,6 @@
           
       </categories>
       
-      
-        <tags>
-            
-            <tag> 指针，踩坑 </tag>
-            
-        </tags>
       
     </entry>
     
@@ -490,6 +465,31 @@
         <tags>
             
             <tag> python技巧 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>QT如何连接mysql</title>
+      <link href="/database/"/>
+      <url>/database/</url>
+      
+        <content type="html"><![CDATA[<p>1：下载并安装mysql<br>配置环境变量：在用户与系统中的path路径分别加入mysql bin文件夹的地址，我的如下：<br>D:\mySQL\MySQL Server 8.0\bin<br>这一步是为了打开cmd直接输入： mysql -u root -p就可以登陆操作数据库，不然只能在D:\mySQL\MySQL Server 8.0\bin打开cmd操作数据库。</p><p>2：在QT中编译mysql驱动：<br>在QT的mysql.pro文件中<br>输入以下代码:注意用<script type="math/tex">quote(地址)是为了忽视地址中的空格，这样在QT调用的时候就不会因为空格找不到文件。win32:LIBS += -L</script>quote(D:/mySQL/MySQL Server 8.0/lib) -llibmysql<br>INCLUDEPATH += <script type="math/tex">quote(D:/mySQL/MySQL Server 8.0/include)DEPENDPATH +=</script>quote(D:/mySQL/MySQL Server 8.0/include)<br>括号中的地址填你之际的安装地址。</p><p>同时注释掉文件中</p><h1 id="QMAKE-USE-mysql"><a href="#QMAKE-USE-mysql" class="headerlink" title="QMAKE_USE += mysql"></a>QMAKE_USE += mysql</h1><p>用MINGW64编译文件，在QT同级目录下出现plugins文件夹。</p><p>3：将mysql数据库动态文件及编译文件粘贴到QT<br>将plugins文件夹生成的qsqlmysql.dll 与qsqlmysql.dll.debug复制到<br>D:\QT\set_qt\5.14.1\mingw73_64\bin</p><p>将动态库文件mysql/lib中的libmysql.dll复制到QT的MINGW64编译器的bin目录下</p><p>4：连接数据库：<br>新建文件，在.pro文件中<br>QT       += core gui sql<br>在用到数据库的.h文件中</p><h1 id="include-lt-QSqlDatabase-gt"><a href="#include-lt-QSqlDatabase-gt" class="headerlink" title="include &lt; QSqlDatabase &gt;"></a>include &lt; QSqlDatabase &gt;</h1><p>在.cpp中连接数据库：<br>QSqlDatabase db = QSqlDatabase::addDatabase(“QMYSQL”);<br>    db.setHostName(“127.0.0.1”);<br>    db.setUserName(“root”);<br>    db.setPassword(“119568yhl”);<br>    db.setDatabaseName(“info”);//这里info是实例化数据库的名称，需要手动实例化。</p><p><img src="/img/database.png" alt="在cmd登录实并例化数据库方法"></p><p>第1步参考视频：<br><a href="https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click">https://www.bilibili.com/video/BV12q4y1477i/?spm_id_from=333.880.my_history.page.click</a></p><p>第2，3步参考视频：<br><a href="https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1Jk4y167tt/?spm_id_from=333.880.my_history.page.click&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p><p>show databases;<br>看到数据库里的存储区<br>use info<br>进入其中的一个存储区<br>show tables;<br>可以看到区里具体的表<br>select * from 表名<br>可以看到表里有啥</p><p>tips:<br>    QString sql1 = QString(“create table %1(id double,x double,y double,h double,v double,t double)”).arg(a);<br>这样可以实现动态设置表名，例如如果需要把每个for循环采集到的数据做成一个表，那么就可以这样动态设置表名<br>表名必须是字母！<br>也可以用函数获取当前的绝对时间，arg(时间)，来实现动态设置表名</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 指针，踩坑 </tag>
             
         </tags>
       
