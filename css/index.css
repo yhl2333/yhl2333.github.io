@@ -4790,7 +4790,7 @@ span.mathjax-overflow {
   border-radius: 5px !important;
 }
 [data-theme="dark"] #web_bg {
-  background: url(/img/6.png);
+  background: url(/img/night.png);
   background-attachment: local;
   background-position: center;
   background-size: cover;
@@ -4805,7 +4805,7 @@ span.mathjax-overflow {
     background-repeat: no-repeat !important;
   }
   [data-theme="dark"] #web_bg {
-    background: url(/img/6.png) !important;
+    background: url(/img/night.png) !important;
     background-attachment: local !important;
     background-position: center !important;
     background-size: cover !important;
