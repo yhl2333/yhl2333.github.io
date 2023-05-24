@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>三大语言的跨平台开发总结</title>
+      <link href="/%E8%B7%A8%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/"/>
+      <url>/%E8%B7%A8%E5%B9%B3%E5%8F%B0%E5%BC%80%E5%8F%91/</url>
+      
+        <content type="html"><![CDATA[<p><font color=red size=5 face="黑体">Ask:</font>跨平台指的是C++程序编译后的可执行文件如 main.o可以直接复制到windows或linux上，并且可以正常运行吗？</p><p><font color=DeepSkyBlue size=5 face="黑体">Answer:</font><br>在理论上，将C++程序的编译后的可执行文件（例如 main.o）从一个平台复制到另一个平台可能会面临以下问题：</p><p>二进制兼容性：不同操作系统和硬件架构使用不同的二进制文件格式和指令集。因此，将一个平台上编译的二进制文件直接复制到另一个平台可能无法识别或执行。</p><p>依赖项和运行时环境：可执行文件可能依赖于特定的库文件、操作系统功能、动态链接器等。如果目标平台上缺少这些依赖项或运行时环境不兼容，那么可执行文件可能无法正常运行。</p><p>系统调用和文件路径：不同的操作系统使用不同的系统调用和文件路径规范。如果程序在一个平台上使用了特定于该平台的系统调用或文件路径，而在目标平台上这些调用或路径不可用或不同，那么程序可能会出现错误或无法正常工作。</p><p>综上所述，将C++程序的编译后的可执行文件直接从一个平台复制到另一个平台并不保证能够直接运行。在跨平台部署时，通常需要重新编译可执行文件以适应目标平台的架构、依赖项和运行时环境，并进行适当的修改以处理不同操作系统的差异。</p><p><font color=red size=5 face="黑体">Ask:</font><br>就是说我在windows上的QT开发了一款应用软件，将这个应用软件复制到linux系统上，会出现二进制不兼容问题吗？</p><p><font color=DeepSkyBlue size=5 face="黑体">Answer:</font><br>当你在Windows上使用Qt开发应用软件时，将生成的可执行文件复制到Linux系统上可能会出现二进制不兼容的问题。这是由于Windows和Linux使用不同的操作系统、不同的二进制文件格式以及不同的系统调用和库的差异所导致的。</p><p>在Windows上编译的可执行文件通常使用PE（Portable Executable）格式，而Linux上使用的是ELF（Executable and Linkable Format）格式。这两种格式是不兼容的，因此无法直接在不同的操作系统上运行。</p><p>此外，Linux和Windows上的系统调用和库也存在差异。如果你的应用程序依赖于特定于Windows的系统调用、库或功能，这些在Linux上可能是不可用的或与Windows上的版本不兼容。</p><p>为了在Linux系统上运行你的应用程序，通常需要在Linux上重新编译你的源代码，并使用适用于Linux的编译器和工具链进行构建。这样可以确保生成适用于Linux的可执行文件，同时处理平台差异和依赖项的问题。</p><p>虽然Qt为跨平台开发提供了很大的便利性，但仍需要在目标平台上进行适当的编译和部署，以确保软件能够在该平台上正常运行。</p><p><font color=red size=5 face="黑体">Ask:</font><br>JAVA程序的跨平台也是指代码得在另一个操作系统上重新由JVM解释和执行才可以，而不是把可执行文件粘贴过去就能用？</p><p><font color=DeepSkyBlue size=5 face="黑体">Answer:</font><br>是的，你的理解是正确的。在Java中，跨平台性是指你的Java代码需要在目标操作系统上重新由JVM解释和执行，而不是简单地将可执行文件复制到另一个操作系统上。</p><p>Java程序通过编译成字节码（.class 文件），这是一种平台无关的中间代码。然后，目标操作系统上的Java虚拟机（JVM）将解释和执行这些字节码。JVM根据具体的操作系统和硬件架构来提供适当的运行环境。</p><p>当你将Java程序的字节码文件（.class 文件）复制到另一个操作系统上时，该操作系统上需要安装适当版本的Java虚拟机（JVM）。JVM会读取并解释字节码，并将其转换为适用于该操作系统的本地机器码，从而执行Java程序。</p><p>因此，跨平台性意味着你可以将Java程序的字节码文件在不同的操作系统上运行，只要目标操作系统上安装了相应的JVM。这样的设计使得Java具有很好的可移植性和兼容性，但仍需要在目标操作系统上提供适当的运行时环境。</p><p>总结而言，Java程序的跨平台性是指你的Java代码在目标操作系统上需要由JVM重新解释和执行，而不是简单地复制可执行文件。这种跨平台性是通过JVM提供的中间层实现的，它在不同的操作系统上提供了统一的运行环境。</p><p><font color=red size=5 face="黑体">Ask:</font><br>那C++中的汇编文件是与中间平台无关的代码吗？</p><p><font color=DeepSkyBlue size=5 face="黑体">Answer:</font><br>C++中的汇编文件（.s 或 .asm 文件）包含了汇编语言代码，它是与特定的硬件架构相关的低级代码。汇编语言是一种与机器码相对应的人类可读的低级语言，用于直接操作计算机的指令集和寄存器。</p><p>汇编文件通常与特定的处理器架构相关，因此与中间平台无关。这意味着汇编文件本身不具备跨平台性。在不同的硬件架构上，汇编文件需要适应不同的指令集和寄存器，因此不能直接在不同的平台上使用相同的汇编文件。</p><p>要使汇编文件在不同的平台上工作，需要根据目标平台的架构和指令集进行适当的修改和调整。这通常需要编写针对特定平台的不同汇编代码，以确保正确地使用该平台的指令和寄存器。</p><p>然而，需要注意的是，C++代码编译成的目标文件（例如，ELF格式的文件）是与平台相关的。目标文件包含了机器码和与特定平台相关的信息，如符号表、重定位表等。因此，即使使用C++编写的源代码是跨平台的，但编译生成的目标文件通常是与特定平台相关的。</p><p>总结起来，C++中的汇编文件是与特定的硬件架构相关的低级代码，并且与中间平台无关。然而，汇编文件本身并不具备跨平台性，需要根据不同平台的指令集和寄存器进行适当的修改。编译生成的目标文件是与特定平台相关的。</p><p><font color=red size=5 face="黑体">Ask:</font><br>那python的跨平台开发呢？</p><p><font color=DeepSkyBlue size=5 face="黑体">Answer:</font><br>Python是一种解释型语言，它的跨平台性非常强。Python的跨平台性是由于以下几个方面的特点：</p><p>解释型语言：Python是一种解释型语言，它的源代码在运行之前不需要编译成机器码。Python解释器会在运行时逐行解释执行代码。由于解释器的存在，Python程序可以在任何安装了Python解释器的操作系统上运行，无需重新编译。</p><p>跨平台的Python解释器：Python解释器本身是跨平台的。它提供了针对各种操作系统的不同版本，例如Windows、Linux、macOS等。你可以选择适用于目标平台的Python解释器进行安装和使用。</p><p>统一的标准库：Python具有丰富的标准库，其中包含了大量的功能模块和工具，可以在不同的操作系统上通用地使用。这些标准库对于Python的跨平台开发提供了很大的便利性，因为它们提供了一致的API和功能，使得你可以在不同的操作系统上编写相同的代码。</p><p>第三方库和框架：Python拥有庞大的第三方库和框架生态系统，提供了各种用于跨平台开发的工具和库。这些库和框架可以帮助你处理不同平台的差异，提供了跨平台开发的解决方案。</p><p>总而言之，Python具有很好的跨平台性，你可以在不同的操作系统上运行相同的Python代码，而无需进行额外的修改或重新编译。这使得Python成为一种流行的选择，特别是在跨平台应用程序开发、脚本编写和数据分析等领域。</p><p><font color=red size=5 face="黑体">Ask:</font><br>那在windows上用python开发的软件复制粘贴到linux系统就可以直接运行吗</p><p><font color=DeepSkyBlue size=5 face="黑体">Answer:</font><br>在Windows上使用Python开发的软件不能直接复制粘贴到Linux系统上并直接运行。尽管Python本身是跨平台的，但在不同的操作系统上仍然存在一些差异和依赖关系需要处理。</p><p>下面是一些需要考虑的关键点：</p><p>Python解释器：确保目标Linux系统上已经安装了适当版本的Python解释器。不同的Linux发行版和版本可能会预装不同的Python版本，因此需要确保Python解释器的兼容性。</p><p>依赖库和模块：你的Python软件可能依赖于各种第三方库和模块。在将软件从Windows复制到Linux时，需要确保目标系统上已经安装了相应的依赖项，包括特定版本的库和模块。</p><p>文件路径和操作系统差异：在代码中使用的文件路径、操作系统相关的功能调用以及其他平台特定的功能可能会有差异。你需要确保代码在Linux系统上适应正确的文件路径格式和操作系统调用。</p><p>脚本解释器头部：在Python脚本的顶部通常会包含一个指定脚本解释器的头部声明，例如 #!/usr/bin/env python。在将脚本从Windows复制到Linux时，需要确保头部声明正确指向目标系统上的Python解释器路径。</p><p>因此，尽管Python具有跨平台的特性，但在将Python软件从一个操作系统复制到另一个操作系统时，仍然需要进行一些调整和配置，以适应目标系统的环境和要求。确保目标系统上已经安装了适当的Python解释器和依赖项，并对代码进行必要的修改，才能确保软件能够在Linux系统上正确运行。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 软硬件 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 跨平台开发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>cMake总结</title>
       <link href="/cMake/"/>
       <url>/cMake/</url>
@@ -404,31 +429,6 @@
     
     
     <entry>
-      <title>C++线程</title>
-      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
-      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
-      
-        <content type="html"><![CDATA[<style>#web_bg{  background: url(/img/22.png)!important;  /*重新定义background会导致原有定位属性失效，所以也需要再声明一次加权的定位属性*/  background-position: center !important;  background-size: cover !important;  background-repeat: no-repeat !important;}</style><p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();<br><img src="/img/thread1.png" alt=""><br>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();<br><img src="/img/thread2.png" alt=""><br>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 线程 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>C++笔记</title>
       <link href="/C-%E8%B8%A9%E5%9D%91/"/>
       <url>/C-%E8%B8%A9%E5%9D%91/</url>
@@ -446,6 +446,31 @@
         <tags>
             
             <tag> 指针，踩坑 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>C++线程</title>
+      <link href="/C-%E7%BA%BF%E7%A8%8B/"/>
+      <url>/C-%E7%BA%BF%E7%A8%8B/</url>
+      
+        <content type="html"><![CDATA[<style>#web_bg{  background: url(/img/22.png)!important;  /*重新定义background会导致原有定位属性失效，所以也需要再声明一次加权的定位属性*/  background-position: center !important;  background-size: cover !important;  background-repeat: no-repeat !important;}</style><p>QT的线程：引入&lt; QThread &gt; 两种用法：</p><p>第一种：<br>&emsp;&emsp;实例化类：thread = new Thread ;<br>&emsp;&emsp;启动线程：&lt; QThread &gt;类中带有虚函数run()，把需要线程处理的函数放在run()中重新实现。即在Thread.h与Thread.cpp文件中重写run()；<br>&emsp;&emsp;启动线程: thread-&gt;start()打开新的线程，就会自动调用run()函数。<br>&emsp;&emsp;关闭线程：thread.quit();thread.wait();<br><img src="/img/thread1.png" alt=""><br>第二种：<br>&emsp;&emsp;该方法更为灵活，方法一将要实现的内容放在run()函数中，这就造成了一定的局限性。新方法将重新定义一个新的class，将该类与实例化的thread绑定(相当于方法一中run()中的内容用新的class重写了)，这样启动thread()就会创建新的线程。<br>&emsp;&emsp;实例化类：thread = new QThread ;（不用创建.h .cpp来重写run()了）<br>&emsp;&emsp;实例化类：myT = new myObject; 在类文件(.h .cpp)中重写要实现的函数myT-&gt;myTimeout()。<br>&emsp;&emsp;将该类与线程绑定：myT-&gt;moveToThread(thread);<br>&emsp;&emsp;启动线程：<br>    thread-&gt;start();<br>    emit startThread();<br>    connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)<br>&emsp;&emsp;关闭线程：<br>    thread.quit();<br>    thread.wait();<br><img src="/img/thread2.png" alt=""><br>&emsp;&emsp;不过要注意，该方法启动线程：thread-&gt;start()，只启动了线程，但没有启动线程处理函数。如果在这之后添加myT-&gt;myTimeout()；来主动调用线程函数也是不可以的，这样会导致线程函数和主线程在同一线程。<br>&emsp;&emsp;(用qDebug&lt;&lt; QThread::currentThread();可以查看当前线程号)<br>&emsp;&emsp;这时需要在Widget构造函数中connect(this,&amp;myWidget::startThread,myT,&amp;myObject::myTimeout)来连接线程函数。<br>&emsp;&emsp;调用thread.quit()；thread.wait();后线程不会立即关闭，而是等待线程函数处理完毕后才会关闭线程。<br>&emsp;&emsp;connect()函数的第五个参数，是和多线程有关的，默认多线程，槽函数所在线程与接收者一样，即myT与&amp;myObject::myTimeout一个线程。这也解释了方法二为什么要用connect()启动线程函数，因为connect()有主线程，子线程之分，当代码中出现绑定线程的操作：myT-&gt;moveToThread(thread)，则connect()就会把myT与&amp;myObject::myTimeout放到子线程执行。</p><p>[线程详细教学]<a href="https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91">https://www.bilibili.com/video/BV1XW411x7NU?p=79&amp;vd_source=b6da26061de3320a8170666f06381a91</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 线程 </tag>
             
         </tags>
       
