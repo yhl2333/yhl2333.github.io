@@ -548,6 +548,31 @@
     
     
     <entry>
+      <title>python编程技巧</title>
+      <link href="/python/"/>
+      <url>/python/</url>
+      
+        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;for id,x in enum(y) 将y中的元素标序号，id为序号，x为元素内容。<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_return</span>()</span><br><span class="line">    b=<span class="number">1</span></span><br><span class="line">    c=<span class="number">2</span> </span><br><span class="line">    d=<span class="number">3</span></span><br><span class="line">    <span class="keyword">return</span> b,c,d</span><br><span class="line"></span><br><span class="line">get_b,get_c,get_d = get_return()</span><br></pre></td></tr></table></figure><br><!-- endtimeline --></p><!-- timeline 2022-5-8 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p><font color=red size=5 face="黑体">python系统路径设置：</font><br>&emsp;&emsp;sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(<strong>file</strong>)))) #将路径添加到系统路径中  将上级目录加入到系统中。<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p><font color=red size=5 face="黑体">python模块导入：</font><br>&emsp;&emsp;x = import_module(‘bert_CNN’)和在文章头部Import相比有什么优点？<br>使用 import_module 函数动态导入模块相比于在文件开始处使用常规的 import 语句具有一些优点：</p><p>1灵活性：使用 import_module 函数可以在运行时动态导入模块，这使得你可以编写更加灵活的代码。例如，你可以根据某些条件或用户输入来决定要导入哪个模块，或者在某些情况下根本不导入模块。<br>2避免循环导入：如果两个或多个模块相互导入，而它们又被导入到另一个模块中，那么就可能会出现循环导入的情况，这会导致程序出现错误。使用 import_module 函数可以避免这种情况，因为它不会立即导入整个模块，而是在需要时才会加载它。<br>3节省资源：使用 import_module 函数可以节省内存和处理器资源，因为它只在需要时加载模块，而不是在程序启动时就立即导入所有模块。<br>4动态扩展：使用 import_module 函数可以让你编写更具有动态扩展性的程序。例如，如果你的程序需要加载第三方插件，那么你可以使用 import_module 函数来动态地加载插件模块，从而扩展程序的功能。<br>需要注意的是，使用 import_module 函数动态导入模块也存在一些缺点。例如，它可能会使代码变得更加复杂和难以理解，因为它增加了代码的动态性。此外，它还可能导致性能下降，因为它需要在运行时进行模块加载。因此，在使用 import_module 函数时需要权衡其优缺点，并选择适合自己的使用方式。<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 软硬件 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> python技巧 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>QT如何连接mysql</title>
       <link href="/database/"/>
       <url>/database/</url>
@@ -590,31 +615,6 @@
         <tags>
             
             <tag> x86 x86_64 GUN GCC g++ gcc </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>python编程技巧</title>
-      <link href="/python/"/>
-      <url>/python/</url>
-      
-        <content type="html"><![CDATA[<!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;markdown语言中%可能引发歧义！报错 tag name expected<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;for num in range(begin,end) num从列表中依次取出begin到end-1的end-begin个整数。<br>如for num in range(1,8) ，num可以遍历到1，2，3，4，5，6，7<br>&emsp;&emsp;for id,x in enum(y) 将y中的元素标序号，id为序号，x为元素内容。<br>&emsp;&emsp;print(f”{}，{}”) 会将大括号里的变量转化为string打印。<br>&emsp;&emsp;lista = [20,10,50,40,30] 排序：lista.sort()改变了lista的顺序。 listb=sorted(lista) 不改变lista的顺序。默认是升序，（）加入reverse=true则为降序。<br>&emsp;&emsp;list中的元素由  ， 隔开。但该逗号不属于列表list的内容。<br>&emsp;&emsp;在写文件中，如果字符串内容为’…\n’，则写出的内容/n消失并换行，因此在读文件时应该处理每行末尾的\n，list[ ：-1]就可以不读入换行符\n<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;pyton的return可以返回三个值，return b,c,d 只要在主题函数中用三个变量来接收就行<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">get_return</span>()</span><br><span class="line">    b=<span class="number">1</span></span><br><span class="line">    c=<span class="number">2</span> </span><br><span class="line">    d=<span class="number">3</span></span><br><span class="line">    <span class="keyword">return</span> b,c,d</span><br><span class="line"></span><br><span class="line">get_b,get_c,get_d = get_return()</span><br></pre></td></tr></table></figure><br><!-- endtimeline --></p><!-- timeline 2022-5-8 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p><font color=red size=5 face="黑体">python系统路径设置：</font><br>&emsp;&emsp;sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(<strong>file</strong>)))) #将路径添加到系统路径中  将上级目录加入到系统中。<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p><font color=red size=5 face="黑体">python模块导入：</font><br>&emsp;&emsp;x = import_module(‘bert_CNN’)和在文章头部Import相比有什么优点？<br>使用 import_module 函数动态导入模块相比于在文件开始处使用常规的 import 语句具有一些优点：</p><p>1灵活性：使用 import_module 函数可以在运行时动态导入模块，这使得你可以编写更加灵活的代码。例如，你可以根据某些条件或用户输入来决定要导入哪个模块，或者在某些情况下根本不导入模块。<br>2避免循环导入：如果两个或多个模块相互导入，而它们又被导入到另一个模块中，那么就可能会出现循环导入的情况，这会导致程序出现错误。使用 import_module 函数可以避免这种情况，因为它不会立即导入整个模块，而是在需要时才会加载它。<br>3节省资源：使用 import_module 函数可以节省内存和处理器资源，因为它只在需要时加载模块，而不是在程序启动时就立即导入所有模块。<br>4动态扩展：使用 import_module 函数可以让你编写更具有动态扩展性的程序。例如，如果你的程序需要加载第三方插件，那么你可以使用 import_module 函数来动态地加载插件模块，从而扩展程序的功能。<br>需要注意的是，使用 import_module 函数动态导入模块也存在一些缺点。例如，它可能会使代码变得更加复杂和难以理解，因为它增加了代码的动态性。此外，它还可能导致性能下降，因为它需要在运行时进行模块加载。因此，在使用 import_module 函数时需要权衡其优缺点，并选择适合自己的使用方式。<br><!-- endtimeline --></p><!-- timeline 2022-12-10 [2.0 -> 2.1](https://github.com/volantis-x/hexo-theme-volantis/releases/tag/2.6.3) --><p>&emsp;&emsp;<br><!-- endtimeline --></p>]]></content>
-      
-      
-      <categories>
-          
-          <category> 软硬件 </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> python技巧 </tag>
             
         </tags>
       
