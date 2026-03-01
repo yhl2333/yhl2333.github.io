@@ -8,17 +8,18 @@
 #recent-posts > .recent-post-item {
   /*max-height:324px;*/  /*文章容器最大高度*/
   margin-top: 1rem; /*最小间距*/
-  display: inline-block;
+
+  display: flex;
   height:auto; /*高度自动*/
-  width:49%;/*文章容器容器宽度,修改为49%就是双列栏！*/ 
+  width:99%;/*文章容器容器宽度,修改为49%就是双列栏！*/ 
   
 }
 #recent-posts > .recent-post-item .post_cover {
-  width: 100%; /*图片封面宽度*/
+  width: 50%; /*图片封面宽度*/
     height: 200px;/*图片封面高度*/
 }
 #recent-posts > .recent-post-item .post_cover img.post_bg {
-  width: 100%;/*图片宽度*/
+  width: 80%;/*图片宽度*/
   height: 100%;/*图片高度*/
 }
 
@@ -28,9 +29,9 @@ display:true;/*隐藏文章详情*/
 }
 #recent-posts > .recent-post-item {
 
-  -webkit-flex-direction: column; /*容器内部纵向排列*/
-  -ms-flex-direction: column; /*容器内部纵向排列*/
-  flex-direction: column; /*容器内部纵向排列*/
+  -webkit-flex-direction: row; /*容器内部纵向排列*/
+  -ms-flex-direction: row; /*容器内部纵向排列*/
+  flex-direction: row /*容器内部纵向排列*/
 
 }
 #recent-posts > .recent-post-item .left_radius {
@@ -39,16 +40,16 @@ display:true;/*隐藏文章详情*/
 #recent-posts > .recent-post-item .right_radius {
     border-radius: 8px 8px 0 0;/*圆角修改*/
 }
-.recent-post-item{
+#recent-posts > .recent-post-item{
     height:auto !important;/*容器高度自动*/
 }
 
-.recent-post-info {
+#recent-posts > .recent-post-info {
 
   padding: 0 40px;/*容器内部文字左右间距*/
   margin-top: 2em;/*容器内部文字上间距*/
   margin-bottom: 2em;/*容器内部文字上间距*/
-  width: 100%!important;/*容器宽度*/
+  width: 50%!important;/*容器宽度*/
 }
 #recent-posts > .recent-post-item > .recent-post-info > .article-title {
     -webkit-line-clamp: 1;/*控制标题的行数*/
